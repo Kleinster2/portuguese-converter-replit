@@ -32,23 +32,28 @@ class TTSConverter:
             
             headers = {
                 'xi-api-key': self.api_key,
-                'Content-Type': 'application/json',
-                'Accept': 'audio/mpeg'
+                'Content-Type': 'application/json'
             }
             
             payload = {
-                'text': text
+                'text': text,
+                'model_id': 'eleven_multilingual_v2',
+                'voice_settings': {
+                    'stability': 0.5,
+                    'similarity_boost': 0.75,
+                    'style': 0.0,
+                    'use_speaker_boost': True
+                }
             }
             
             print("Sending request to ElevenLabs API...")
-            tts_url = f"{self.base_url}/text-to-speech/{self.voice_id}/stream"
+            tts_url = f"{self.base_url}/text-to-speech/{self.voice_id}"
             print(f"Request URL: {tts_url}")
             
             response = requests.post(
                 tts_url,
                 json=payload,
-                headers=headers,
-                stream=True
+                headers=headers
             )
             
             print(f"Response status: {response.status_code}")
