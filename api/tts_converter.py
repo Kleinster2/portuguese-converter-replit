@@ -26,8 +26,8 @@ class TTSConverter:
             
             payload = {
                 'text': text,
-                'voice_id': '21m00Tcm4TlvDq8ikWAM',  # Default voice ID
-                'model_id': 'eleven_multilingual_v1'
+                'voice_id': 'pNInz6obpgDQGcFmaJgB',  # Adam voice
+                'model_id': 'eleven_monolingual_v1'
             }
             
             response = requests.post(self.url, json=payload, headers=headers)
