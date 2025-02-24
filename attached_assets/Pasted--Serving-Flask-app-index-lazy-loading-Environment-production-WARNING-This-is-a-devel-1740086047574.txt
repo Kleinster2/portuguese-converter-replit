@@ -1,0 +1,39 @@
+ * Serving Flask app 'index' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.54:3000
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug:172.31.128.54 - - [20/Feb/2025 21:12:25] "GET / HTTP/1.1" 304 -
+DEBUG: Input text = 'teste'
+INFO:werkzeug:172.31.128.54 - - [20/Feb/2025 21:13:17] "POST /api/portuguese_converter HTTP/1.1" 200 -
+INFO:__main__:Processing TTS request with text length: 5
+ERROR:__main__:Error in /tts: Exception with error code: 
+[CALL STACK BEGIN]
+
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1effe9) [0x7f7bb93effe9]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x201a29) [0x7f7bb9401a29]
+/nix/store/wn7v2vhyyyi6clcyn0s9ixvl7d4d87ic-glibc-2.40-36/lib/libc.so.6(+0x95e2f) [0x7f7bbb4c4e2f]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x202b5a) [0x7f7bb9402b5a]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1bd8b1) [0x7f7bb93bd8b1]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1b73ad) [0x7f7bb93b73ad]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1f6c67) [0x7f7bb93f6c67]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1d1974) [0x7f7bb93d1974]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1cc472) [0x7f7bb93cc472]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0xf24e5) [0x7f7bb92f24e5]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1f6c67) [0x7f7bb93f6c67]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x1c3c55) [0x7f7bb93c3c55]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(+0x20ff1c) [0x7f7bb940ff1c]
+/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/azure/cognitiveservices/speech/libMicrosoft.CognitiveServices.Speech.core.so(synthesizer_create_speech_synthesizer_from_config+0xf3) [0x7f7bb92bcc97]
+/nix/store/lw7psn749bfn2nrn943jdh68hh2im8yl-libffi-3.4.6/lib/libffi.so.8(+0xa052) [0x7f7bb9ae9052]
+/nix/store/lw7psn749bfn2nrn943jdh68hh2im8yl-libffi-3.4.6/lib/libffi.so.8(+0x8125) [0x7f7bb9ae7125]
+/nix/store/lw7psn749bfn2nrn943jdh68hh2im8yl-libffi-3.4.6/lib/libffi.so.8(ffi_call+0xd8) [0x7f7bb9ae7d38]
+[CALL STACK END]
+
+Runtime error: Failed to initialize platform (azure-c-shared). Error: 2153
+INFO:werkzeug:172.31.128.54 - - [20/Feb/2025 21:13:18] "POST /api/tts HTTP/1.1" 500 -
+^C

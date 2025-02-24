@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portuguese Text Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .explanations {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Portuguese Text Converter</h1>
+        <p>Enter Portuguese text below to convert it to natural patterns in São Paulo-based rapid speech:</p>
+        
+        <textarea id="inputText" placeholder="Enter Portuguese text here..."></textarea>
+        <button onclick="convertText()">Convert</button>
+        
+        <div id="result" class="result" style="display: none;">
+            <p>
+                <strong>Transformations:</strong> 
+                <span id="originalText"></span>
+            </p>
+            <p>
+                <strong>Combinations:</strong> 
+                <span id="convertedText"></span>
+            </p>
+            <div class="explanations">
+                <h4>Word Transformations:</h4>
+                <ul id="explanationsList"></ul>
+                <h4>Word Combinations:</h4>
+                <ul id="combinationsList"></ul>
+            </div>
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Determine if we're in production (Vercel) or development
+        const isProduction = window.location.hostname !== 'localhost';
+        const API_BASE = isProduction ? '' : 'http://localhost:5000';
+
+        async function convertText() {
+            const inputText = document.getElementById('inputText').value.trim();
+            if (!inputText) {
+                showError('Please enter some text to convert');
+                return;
+            }
+
+            try {
+                // Show loading state
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('result').style.display = 'none';
+                
+                const response = await fetch(`${API_BASE}/api/portuguese_converter`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ text: inputText })
+                });
+
+                // First try to get the response as text to debug any issues
+                const responseText = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Failed to parse response:', responseText);
+                    throw new Error('Invalid response from server');
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to convert text');
+                }
+
+                // Show results
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('originalText').textContent = data.original || data.before || inputText;
+                document.getElementById('convertedText').textContent = data.after || '';
+                
+                // Show explanations
+                const explanationsList = document.getElementById('explanationsList');
+                const combinationsList = document.getElementById('combinationsList');
+                explanationsList.innerHTML = '';
+                combinationsList.innerHTML = '';
+
+                if (data.explanations && data.explanations.length > 0) {
+                    data.explanations.forEach(explanation => {
+                        const li = document.createElement('li');
+                        li.textContent = explanation;
+                        explanationsList.appendChild(li);
+                    });
+                }
+
+                if (data.combinations && data.combinations.length > 0) {
+                    data.combinations.forEach(combination => {
+                        const li = document.createElement('li');
+                        li.textContent = combination;
+                        combinationsList.appendChild(li);
+                    });
+                }
+
+            } catch (error) {
+                console.error('Conversion error:', error);
+                showError(error.message || 'Failed to convert text');
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        async function playText(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            if (!text) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/tts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'audio/wav'
+                    },
+                    body: JSON.stringify({ text })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to generate speech');
+                }
+                
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                // Clean up the URL after playing
+                audio.onended = () => URL.revokeObjectURL(audioUrl);
+                
+                await audio.play();
+            } catch (error) {
+                console.error('Error playing audio:', error);
+                alert('Failed to play audio: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
