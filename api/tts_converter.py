@@ -26,6 +26,9 @@ class TTSConverter:
                 error_details = response.json()
                 print(f"ElevenLabs API Error: Status {response.status_code}")
                 print(f"Error details: {error_details}")
+                print(f"Request URL: {self.url}")
+                print(f"Headers: {response.request.headers}")
+                print(f"Request body: {response.request.body}")
                 return None
 
         except Exception as e:
