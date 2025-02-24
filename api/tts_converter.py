@@ -23,7 +23,9 @@ class TTSConverter:
             if response.status_code == 200:
                 return response.content
             else:
-                print(f"Error: {response.json()}")
+                error_details = response.json()
+                print(f"ElevenLabs API Error: Status {response.status_code}")
+                print(f"Error details: {error_details}")
                 return None
 
         except Exception as e:
