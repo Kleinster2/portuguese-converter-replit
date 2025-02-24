@@ -19,18 +19,31 @@ class TTSConverter:
 
     def synthesize_speech(self, text):
         try:
+            print(f"Attempting TTS conversion with text: {text}")
             headers = {
                 'xi-api-key': self.api_key,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'audio/mpeg'
             }
             
             payload = {
                 'text': text,
-                'voice_id': 'pNInz6obpgDQGcFmaJgB',  # Adam voice
-                'model_id': 'eleven_monolingual_v1'
+                'model_id': 'eleven_monolingual_v1',
+                'voice_settings': {
+                    'stability': 0.75,
+                    'similarity_boost': 0.75
+                }
             }
             
-            response = requests.post(self.url, json=payload, headers=headers)
+            print("Sending request to ElevenLabs API...")
+            response = requests.post(
+                f"{self.url}/21m00Tcm4TlvDq8ikWAM",  # Rachel voice
+                json=payload,
+                headers=headers
+            )
+            
+            print(f"Response status: {response.status_code}")
+            print(f"Response headers: {response.headers}")
 
             if response.status_code == 200:
                 return response.content
