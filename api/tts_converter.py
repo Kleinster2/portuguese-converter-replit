@@ -36,8 +36,9 @@ class TTSConverter:
             }
             
             print("Sending request to ElevenLabs API...")
+            voice_id = "21m00Tcm4TlvDq8ikWAM"  # Rachel voice
             response = requests.post(
-                f"{self.url}/21m00Tcm4TlvDq8ikWAM",  # Rachel voice
+                f"{self.url}/{voice_id}",
                 json=payload,
                 headers=headers
             )
