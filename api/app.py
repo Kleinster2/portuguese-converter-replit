@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from portuguese_converter import convert_text
+from tts_converter import TTSConverter
 import logging
 
 # Configure logging
@@ -27,6 +28,27 @@ def handle_portuguese_converter():
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error: {str(e)}")
+
+
+@app.route('/api/tts', methods=['POST'])
+def text_to_speech():
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
+
+        tts = TTSConverter()
+        audio_content = tts.synthesize_speech(data['text'])
+        
+        if audio_content:
+            return Response(audio_content, mimetype='audio/mpeg')
+        else:
+            return jsonify({'error': 'Failed to generate audio'}), 500
+            
+    except Exception as e:
+        logger.error(f"Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
