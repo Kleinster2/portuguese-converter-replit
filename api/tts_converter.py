@@ -28,26 +28,27 @@ class TTSConverter:
     def synthesize_speech(self, text):
         try:
             print(f"Attempting TTS conversion with text: {text}")
+            print(f"Using API key: {self.api_key[:5]}...")  # Show first 5 chars only
+            
             headers = {
                 'xi-api-key': self.api_key,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'audio/mpeg'
             }
             
             payload = {
-                'text': text,
-                'model_id': 'eleven_monolingual_v1',
-                'voice_settings': {
-                    'stability': 0.5,
-                    'similarity_boost': 0.5
-                }
+                'text': text
             }
             
             print("Sending request to ElevenLabs API...")
-            tts_url = f"{self.base_url}/text-to-speech/{self.voice_id}"
+            tts_url = f"{self.base_url}/text-to-speech/{self.voice_id}/stream"
+            print(f"Request URL: {tts_url}")
+            
             response = requests.post(
                 tts_url,
                 json=payload,
-                headers=headers
+                headers=headers,
+                stream=True
             )
             
             print(f"Response status: {response.status_code}")
