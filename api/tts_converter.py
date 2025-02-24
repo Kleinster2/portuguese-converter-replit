@@ -22,8 +22,7 @@ class TTSConverter:
                 'model_id': 'eleven_multilingual_v1'
             }
             
-            response = requests.post(self.url, json=payload, headers=headers
-            })
+            response = requests.post(self.url, json=payload, headers=headers)
 
             if response.status_code == 200:
                 return response.content
