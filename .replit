@@ -8,7 +8,7 @@ channel = "stable-24_05"
 run = ["sh", "-c", "python api/app.py"]
 
 [workflows]
-runButton = "Test TTS"
+runButton = "Start Server"
 
 [[workflows.workflow]]
 name = "Run"
@@ -33,6 +33,14 @@ author = 36434075
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python test_tts.py"
+
+[[workflows.workflow]]
+name = "Start Server"
+author = 36434075
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python api/app.py"
 
 [[ports]]
 localPort = 3000
