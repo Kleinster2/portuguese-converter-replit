@@ -11,10 +11,10 @@ class TTSConverter:
 
     def synthesize_speech(self, text):
         try:
-            response = requests.post(self.url, json={
+            payload = {
                 'text': text,
-                'voice_id': 'EXAVITQu4vr4xnSDxMaL',  # Default voice ID
-                'model_id': 'eleven_multilingual_v2'
+                'voice_id': '21m00Tcm4TlvDq8ikWAM',  # Default voice ID
+                'model_id': 'eleven_multilingual_v1'
             }, headers={
                 'xi-api-key': self.api_key,
                 'Content-Type': 'application/json'
