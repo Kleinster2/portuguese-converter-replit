@@ -54,6 +54,19 @@
             color: #dc3545;
             margin-top: 10px;
         }
+        .play-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .play-button:hover {
+            background-color: #218838;
+        }
         
     </style>
 </head>
@@ -69,10 +82,12 @@
             <p>
                 <strong>Transformations:</strong> 
                 <span id="originalText"></span>
+                <button onclick="playText('originalText')" class="play-button">▶️ Play</button>
             </p>
             <p>
                 <strong>Combinations:</strong> 
                 <span id="convertedText"></span>
+                <button onclick="playText('convertedText')" class="play-button">▶️ Play</button>
             </p>
             <div class="explanations">
                 <h4>Word Transformations:</h4>
