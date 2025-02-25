@@ -18,9 +18,8 @@ class TTSConverter:
             print(f"Response: {response.text}")
             raise Exception("Invalid ElevenLabs API key")
         
-        # Use Ale Garcia voice ID
-        self.voice_id = "VR6AewLTigWG4xSOukaG"  # Ale Garcia voice ID
-        print(f"Using Ale Garcia voice ID: {self.voice_id}")
+        self.voice_id = "kd1lRcSdRGIfyKxQKjmH"
+        print(f"Using voice ID: {self.voice_id}")
 
     def synthesize_speech(self, text):
         try:
