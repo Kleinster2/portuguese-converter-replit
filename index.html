@@ -183,7 +183,10 @@
         }
 
         async function playText(elementId) {
-            const text = document.getElementById(elementId).textContent;
+            // Always use the original input text for TTS
+            const text = elementId === 'originalText' ? 
+                document.getElementById('inputText').value : 
+                document.getElementById(elementId).textContent;
             if (!text) return;
             
             try {
