@@ -89,6 +89,9 @@
                 <span id="convertedText"></span>
                 <button onclick="playText('convertedText')" class="play-button">▶️ Play</button>
             </p>
+            <p>
+                <button onclick="playText('inputText')" class="play-button">▶️ Play Original Input</button>
+            </p>
             <div class="explanations">
                 <h4>Word Transformations:</h4>
                 <ul id="explanationsList"></ul>
@@ -183,10 +186,14 @@
         }
 
         async function playText(elementId) {
-            // Always use the original input text for TTS
-            const text = elementId === 'originalText' ? 
-                document.getElementById('inputText').value : 
-                document.getElementById(elementId).textContent;
+            let text;
+            if (elementId === 'inputText') {
+                // Play the original input text
+                text = document.getElementById('inputText').value;
+            } else {
+                // Play the text from the specified element
+                text = document.getElementById(elementId).textContent;
+            }
             if (!text) return;
             
             try {
