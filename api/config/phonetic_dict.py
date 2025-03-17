@@ -138,8 +138,6 @@ PHONETIC_DICTIONARY = {
     'atrás': 'atráyz',
     'bem': 'beyn',
     'depois': 'dipois',
-    'desculpa': 'discupa',
-    'desculpas': 'discupas',
     'empresa': 'impreza',
     'empresas': 'imprezas',
     'então': 'entãum',
