@@ -72,6 +72,7 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     lword = word.lower()
 
     # Special case for 'muito' variations using regex
+    """
     if re.match(r'^muito[as]?$', lword):
         # Before vowels → add "t"
         if next_word and re.match(r'^[aeiou]', next_word.lower()):
@@ -85,7 +86,8 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
             trans = re.sub(r'^(m)uita(s?)$', r'mũynta\2', trans)
             trans = preserve_capital(word, trans)
             return trans, f"Muito before consonant: {word} → {trans}"
-
+            """
+    
     # Special handling for não before verbs
     if lword in ["não", "nao", "nãun", "nãu", "nau", "no"]:
         if next_word:
@@ -152,9 +154,9 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     # Apply transformation rules
     entrar_forms = ['entrar', 'entro', 'entra', 'entramos', 'entram', 'entrei', 'entrou',
                     'entraram', 'entrava', 'entravam']
-    trans = apply_transform(r'^en', 'in', trans, "Initial en → in") if word.lower() not in entrar_forms else trans
+    trans = apply_transform(r'^ent', 'int', trans, "Initial ent → int") if word.lower() not in entrar_forms else trans
     trans = apply_transform(r'^des', 'dis', trans, "Transform initial 'des' to 'dis'")
-    trans = apply_transform(r'^ment', 'mint', trans, "Transform initial 'ment' to 'mint'")
+    trans = apply_transform(r'^menti', 'minti', trans, "Transform initial 'menti' to 'minti'")
 
     trans = apply_transform(r'ovo$', 'ôvo', trans, "Transform ending 'ovo' to 'ôvo'")
     trans = apply_transform(r'ovos$', 'óvos', trans, "Transform ending 'ovos' to 'óvos'")
