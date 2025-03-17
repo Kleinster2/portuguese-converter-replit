@@ -201,7 +201,8 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     trans = apply_transform(r'^pol', 'pul', trans, "Initial pol → pul")
     trans = apply_transform(r'ol$', 'óu', trans, "Final ol → óu")
     trans = apply_transform(r'l$', 'u', trans, "Final l → u")
-    trans = apply_transform(f'l([{consonants}])', r'u\1', trans, "l before consonant → u")
+    trans = apply_transform(r'ul([' + consonants + '])', r'u\1', trans, "ul before consonant → u (remove duplicate u)")
+    trans = apply_transform(f'([^u])l([{consonants}])', r'\1u\2', trans, "l before consonant → u (if not after u)")
 
     for p in ['bs', 'ps', 'pn', 'dv', 'pt', 'pç', 'dm', 'gn', 'tm', 'tn']:
         trans = apply_transform(rf'({p[0]})({p[1]})', r'\1i\2', trans,
