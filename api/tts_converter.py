@@ -48,7 +48,7 @@ class TTSConverter:
             }
             
             print("Sending request to ElevenLabs API...")
-            tts_url = f"{self.base_url}/text-to-speech/{self.voice_id}"
+            tts_url = f"{self.base_url}/text-to-speech/{voice_id}"
             print(f"Request URL: {tts_url}")
             
             response = requests.post(
