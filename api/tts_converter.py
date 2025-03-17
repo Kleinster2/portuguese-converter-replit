@@ -20,7 +20,7 @@ class TTSConverter:
         
         self.voices = {
             'br': "kd1lRcSdRGIfyKxQKjmH",  # Brazilian Portuguese
-            'pt': "IlrWo5tGgTuxNTHyGhWD"    # European Portuguese
+            'pt': "VR6AewLTigWG4xSOukaG"    # European Portuguese
         }
         print(f"Available voices: BR and PT")
 
