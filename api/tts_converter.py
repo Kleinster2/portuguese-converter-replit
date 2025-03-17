@@ -18,18 +18,23 @@ class TTSConverter:
             print(f"Response: {response.text}")
             raise Exception("Invalid ElevenLabs API key")
         
-        self.voice_id = "kd1lRcSdRGIfyKxQKjmH"
-        print(f"Using voice ID: {self.voice_id}")
+        self.voices = {
+            'br': "kd1lRcSdRGIfyKxQKjmH",  # Brazilian Portuguese
+            'pt': "OdTGaYBsYXwxXGiODyIz"    # European Portuguese
+        }
+        print(f"Available voices: BR and PT")
 
-    def synthesize_speech(self, text):
+    def synthesize_speech(self, text, variant='br'):
         try:
             print(f"Attempting TTS conversion with text: {text}")
-            print(f"Using API key: {self.api_key[:5]}...")  # Show first 5 chars only
+            print(f"Using API key: {self.api_key[:5]}... and variant: {variant}")
             
             headers = {
                 'xi-api-key': self.api_key,
                 'Content-Type': 'application/json'
             }
+            
+            voice_id = self.voices.get(variant, self.voices['br'])
             
             payload = {
                 'text': text,

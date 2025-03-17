@@ -34,17 +34,19 @@ def handle_portuguese_converter():
 def text_to_speech():
     try:
         data = request.get_json()
-        if not data or 'text' not in data:
+        text = data.get('text', '')
+        variant = data.get('variant', 'br')
+        if not text:
             return jsonify({'error': 'No text provided'}), 400
 
         tts = TTSConverter()
-        audio_content = tts.synthesize_speech(data['text'])
-        
+        audio_content = tts.synthesize_speech(text, variant)
+
         if audio_content:
             return Response(audio_content, mimetype='audio/mpeg')
         else:
             return jsonify({'error': 'Failed to generate audio'}), 500
-            
+
     except Exception as e:
         logger.error(f"Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
