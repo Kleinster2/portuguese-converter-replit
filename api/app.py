@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from portuguese_converter import convert_text
 from tts_converter import TTSConverter
+from twilio_handler import TwilioHandler
 import logging
 
 # Configure logging
@@ -10,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
+twilio = TwilioHandler()
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -50,6 +52,15 @@ def text_to_speech():
     except Exception as e:
         logger.error(f"Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/webhook/twilio', methods=['POST'])
+def twilio_webhook():
+    try:
+        twilio.handle_message(request.form)
+        return '', 200
+    except Exception as e:
+        logger.error(f"Error in Twilio webhook: {str(e)}")
+        return '', 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=False)
