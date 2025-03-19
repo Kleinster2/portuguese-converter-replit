@@ -70,23 +70,6 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
 
     # First check if word is in pre-defined dictionary
     lword = word.lower()
-
-    # Special case for 'muito' variations using regex
-    """
-    if re.match(r'^muito[as]?$', lword):
-        # Before vowels → add "t"
-        if next_word and re.match(r'^[aeiou]', next_word.lower()):
-            trans = re.sub(r'^(m)uito(s?)$', r'mũt\2', lword)
-            trans = re.sub(r'^(m)uita(s?)$', r'mũta\2', trans)
-            trans = preserve_capital(word, trans)
-            return trans, f"Muito before vowel: {word} → {trans}"
-        # Before consonants → nasalize without "t"
-        else:
-            trans = re.sub(r'^(m)uito(s?)$', r'mũyntu\2', lword)
-            trans = re.sub(r'^(m)uita(s?)$', r'mũynta\2', trans)
-            trans = preserve_capital(word, trans)
-            return trans, f"Muito before consonant: {word} → {trans}"
-            """
     
     # Special handling for não before verbs
     if lword in ["não", "nao", "nãun", "nãu", "nau", "no"]:
