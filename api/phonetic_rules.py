@@ -152,9 +152,9 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
         trans = apply_transform(r'ar$', 'á', trans, "Infinitive ending: ar → á")
         trans = apply_transform(r'er$', 'ê', trans, "Infinitive ending: er →ê")
         trans = apply_transform(r'ir$', 'í', trans, "Infinitive ending: ir → í")
-        trans = apply_transform(r'amos$', 'ãmu', trans, "Verb ending 'amos' → 'ãmu'")
-        trans = apply_transform(r'emos$', 'êmu', trans, "Verb ending 'emos' → 'êmu'")
-        trans = apply_transform(r'imos$', 'imu', trans, "Verb ending 'imos' → 'imu'")
+        trans = apply_transform(r'am[ou]s$', 'ãmu', trans, "Verb ending 'amos/amus' → 'ãmu'")
+        trans = apply_transform(r'em[ou]s$', 'êmu', trans, "Verb ending 'emos/emus' → 'êmu'")
+        trans = apply_transform(r'im[ou]s$', 'imu', trans, "Verb ending 'imos/imus' → 'imu'")
 
     trans = apply_transform(r'o$', 'u', trans, "Final o → u")
     trans = apply_transform(r'os$', 'us', trans, "Final os → us")
