@@ -170,7 +170,8 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
 
     trans = apply_transform(r'olh', 'ôli', trans, "olh → ôly") if not is_verb(word) else trans
     trans = apply_transform(r'lh', 'li', trans, "lh → ly")
-    trans = apply_transform(r'ou$', 'ô', trans, "ou → ô")
+    # Unified rule for any "ou" to "ô" transformation anywhere in the word
+    trans = apply_transform(r'ou', 'ô', trans, "ou → ô (anywhere)")
 
     consonants = 'bcdfgjklmnpqrstvwxz'
     trans = apply_transform(r'al([' + consonants + '])', r'au\1', trans, "al+consonant → au")
@@ -195,8 +196,7 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     trans = apply_transform(r'c$', 'ki', trans, "Final c → ki")
     trans = apply_transform(r'g$', r'\0ui', trans, "Append ui after final g")
     trans = apply_transform(r'eir', 'êr', trans, "eir → êr")
-    trans = apply_transform(r'^ou', 'ô', trans, "Transform initial 'ou' to 'ô'")
-    trans = apply_transform(r'^sou', 'sô', trans, "Transform initial 'sou' to 'sô'")
+    # Removed specific initial 'ou' rules as they're covered by the unified rule
     trans = apply_transform(r'^des', 'dis', trans, "Transform initial 'des' to 'dis'")
     trans = apply_transform(r'ora$', 'óra', trans, "Transform ending 'ora' to 'óra'")
     trans = apply_transform(r'oras$', 'óras', trans, "Transform ending 'oras' to 'óras'")
