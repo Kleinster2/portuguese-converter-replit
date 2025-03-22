@@ -74,6 +74,10 @@ PHONETIC_DICTIONARY = {
     # Adverbs
     'demais': 'dimais',
     'devagar': 'divagá',
+    'outro': 'ôtru',
+    'outros': 'ôtrus',
+    'outra': 'ôtra',
+    'outras': 'ôtras',
 
     # Prepositions and Conjunctions
     'à': 'a',
@@ -168,6 +172,10 @@ PHONETIC_DICTIONARY = {
     'menos': 'menus',
     'menor': 'menór',
     'menores': 'menoris',
+    'pouco': 'pôcu',
+    'poucos': 'pôcus',
+    'pouca': 'pôca',
+    'poucas': 'pôcas',
     'bonito': 'bunitu',
     'bonita': 'bunita',
     'bonitas': 'bunitas',

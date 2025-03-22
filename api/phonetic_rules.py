@@ -70,7 +70,7 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
 
     # First check if word is in pre-defined dictionary
     lword = word.lower()
-
+    
     # Special handling for não before verbs
     if lword in ["não", "nao", "nãun", "nãu", "nau", "no"]:
         if next_word:
@@ -116,7 +116,7 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
         trans = IRREGULAR_VERBS[lword].lower()
         trans = preserve_capital(word, trans)
         return trans, f"Irregular verb: {word} → {trans}"
-
+        
     # Check direct transformations and dictionary
     if lword in PHONETIC_DICTIONARY:
         # Special case for 'olho' - treat as verb if preceded by 'eu'
@@ -170,7 +170,7 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
 
     trans = apply_transform(r'olh', 'ôli', trans, "olh → ôly") if not is_verb(word) else trans
     trans = apply_transform(r'lh', 'li', trans, "lh → ly")
-    trans = apply_transform(r'ou', 'ô', trans, "ou → ô (anywhere in word)")
+    trans = apply_transform(r'ou$', 'ô', trans, "ou → ô")
 
     consonants = 'bcdfgjklmnpqrstvwxz'
     trans = apply_transform(r'al([' + consonants + '])', r'au\1', trans, "al+consonant → au")
@@ -181,6 +181,11 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     trans = apply_transform(r'um$', 'un', trans, "Final um → un")
     trans = apply_transform(r'^h', '', trans, "Remove initial h")
     trans = apply_transform(r'^ex', 'iz', trans, "Initial ex → iz")
+    trans = apply_transform(r'^pol', 'pul', trans, "Initial pol → pul")
+    trans = apply_transform(r'ol$', 'óu', trans, "Final ol → óu")
+    trans = apply_transform(r'l$', 'u', trans, "Final l → u")
+    trans = apply_transform(r'ul([' + consonants + '])', r'u\1', trans, "ul before consonant → u (remove duplicate u)")
+    trans = apply_transform(f'([^u])l([{consonants}])', r'\1u\2', trans, "l before consonant → u (if not after u)")
 
     for p in ['bs', 'ps', 'pn', 'dv', 'pt', 'pç', 'dm', 'gn', 'tm', 'tn']:
         trans = apply_transform(rf'({p[0]})({p[1]})', r'\1i\2', trans,
@@ -190,10 +195,12 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     trans = apply_transform(r'c$', 'ki', trans, "Final c → ki")
     trans = apply_transform(r'g$', r'\0ui', trans, "Append ui after final g")
     trans = apply_transform(r'eir', 'êr', trans, "eir → êr")
+    trans = apply_transform(r'^ou', 'ô', trans, "Transform initial 'ou' to 'ô'")
+    trans = apply_transform(r'^sou', 'sô', trans, "Transform initial 'sou' to 'sô'")
+    trans = apply_transform(r'^des', 'dis', trans, "Transform initial 'des' to 'dis'")
     trans = apply_transform(r'ora$', 'óra', trans, "Transform ending 'ora' to 'óra'")
     trans = apply_transform(r'oras$', 'óras', trans, "Transform ending 'oras' to 'óras'")
     trans = apply_transform(r'ês$', 'êis', trans, "Final 'ês' becomes 'êis'")
-
 
     # Preserve capitalization
     trans = preserve_capital(word, trans)
