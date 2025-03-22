@@ -74,10 +74,6 @@ PHONETIC_DICTIONARY = {
     # Adverbs
     'demais': 'dimais',
     'devagar': 'divagá',
-    'outro': 'ôtru',
-    'outros': 'ôtrus',
-    'outra': 'ôtra',
-    'outras': 'ôtras',
 
     # Prepositions and Conjunctions
     'à': 'a',
