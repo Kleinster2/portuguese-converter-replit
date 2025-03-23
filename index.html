@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portuguese Text Converter</title>
+    <title>Portuguese Text Converter Chat</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,17 +18,66 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
         }
-        textarea {
-            width: 100%;
-            min-height: 100px;
-            margin: 10px 0;
+        .chat-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            margin-bottom: 20px;
+        }
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-message {
+            background-color: #e9ecef;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .message-explanation {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            padding: 5px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input {
+            flex-grow: 1;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
         }
-        button {
+        .send-button {
             background-color: #007bff;
             color: white;
             border: none;
@@ -36,91 +86,91 @@
             cursor: pointer;
             font-size: 16px;
         }
-        button:hover {
+        .send-button:hover {
             background-color: #0056b3;
         }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-left: 4px solid #007bff;
-            background-color: #f8f9fa;
-        }
-        .explanations {
-            margin-top: 10px;
-            font-size: 14px;
+        .loading {
+            align-self: center;
+            margin: 10px 0;
             color: #666;
         }
-        .error {
-            color: #dc3545;
-            margin-top: 10px;
-        }
-        .play-button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            font-size: 14px;
-            background-color: #28a745;
-            color: white;
+        .toggle-explanations {
+            background-color: transparent;
             border: none;
-            border-radius: 4px;
+            color: #007bff;
             cursor: pointer;
+            margin-left: auto;
+            font-size: 12px;
+            text-decoration: underline;
         }
-        .play-button:hover {
-            background-color: #218838;
-        }
-        
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Portuguese Text Converter</h1>
-        <p>Enter Portuguese text below to convert it to colloquial, rapid speech:</p>
+        <div class="chat-header">
+            <h1>Portuguese Text Chat Converter</h1>
+            <p>Type in standard Portuguese, get back colloquial speech!</p>
+        </div>
         
-        <textarea id="inputText" placeholder="Enter Portuguese text here..."></textarea>
-        <button onclick="convertText()">Convert</button>
-        
-        <div id="result" class="result" style="display: none;">
-            <!-- <p>
-                <button onclick="playText('inputText', 'br')" class="play-button">▶️ Play BR Input</button>
-                <button onclick="playText('inputText', 'pt')" class="play-button">▶️ Play PT Input</button>
-            </p> -->
-            <p>
-                <strong>Transformations:</strong> 
-                <span id="originalText"></span>
-                <!-- <button onclick="playText('originalText')" class="play-button">▶️ Play</button> -->
-            </p>
-            <p>
-                <strong>Combinations:</strong> 
-                <span id="convertedText"></span>
-                <!-- <button onclick="playText('convertedText')" class="play-button">▶️ Play</button> -->
-            </p>
-            <div class="explanations">
-                <h4>Word Transformations:</h4>
-                <ul id="explanationsList"></ul>
-                <h4>Word Combinations:</h4>
-                <ul id="combinationsList"></ul>
+        <div id="chat-messages" class="chat-messages">
+            <div class="message bot-message">
+                Olá! Digite uma mensagem em português e eu vou mostrar como ela seria na fala coloquial rápida.
             </div>
         </div>
         
-        <div id="error" class="error" style="display: none;"></div>
+        <div class="input-container">
+            <input id="chat-input" class="chat-input" type="text" placeholder="Type your message in Portuguese..." autofocus>
+            <button id="send-button" class="send-button">Send</button>
+        </div>
     </div>
 
     <script>
         // Determine if we're in production (Vercel) or development
         const isProduction = window.location.hostname !== 'localhost';
         const API_BASE = isProduction ? '' : 'http://localhost:5000';
-
-        async function convertText() {
-            const inputText = document.getElementById('inputText').value.trim();
-            if (!inputText) {
-                showError('Please enter some text to convert');
-                return;
+        
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        
+        let showExplanations = false;
+        
+        // Send message when button is clicked
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Send message when Enter key is pressed
+        chatInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
-
+        });
+        
+        function toggleExplanations() {
+            showExplanations = !showExplanations;
+            const explanations = document.querySelectorAll('.message-explanation');
+            
+            explanations.forEach(exp => {
+                exp.style.display = showExplanations ? 'block' : 'none';
+            });
+        }
+        
+        async function sendMessage() {
+            const inputText = chatInput.value.trim();
+            if (!inputText) return;
+            
+            // Add user message to chat
+            addMessage(inputText, 'user');
+            
+            // Clear input
+            chatInput.value = '';
+            
+            // Show loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading';
+            loadingIndicator.textContent = 'Converting...';
+            chatMessages.appendChild(loadingIndicator);
+            
             try {
-                // Show loading state
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('result').style.display = 'none';
-                
                 const response = await fetch(`${API_BASE}/api/portuguese_converter`, {
                     method: 'POST',
                     headers: {
@@ -129,8 +179,11 @@
                     },
                     body: JSON.stringify({ text: inputText })
                 });
-
-                // First try to get the response as text to debug any issues
+                
+                // Remove loading indicator
+                chatMessages.removeChild(loadingIndicator);
+                
+                // Try parsing the response as text first to debug
                 const responseText = await response.text();
                 let data;
                 
@@ -138,92 +191,108 @@
                     data = JSON.parse(responseText);
                 } catch (parseError) {
                     console.error('Failed to parse response:', responseText);
-                    throw new Error('Invalid response from server');
+                    addMessage('Error: Failed to parse server response.', 'bot');
+                    return;
                 }
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to convert text');
-                }
-
-                // Show results
-                document.getElementById('result').style.display = 'block';
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('originalText').textContent = data.original || data.before || inputText;
-                document.getElementById('convertedText').textContent = data.after || '';
                 
-                // Show explanations
-                const explanationsList = document.getElementById('explanationsList');
-                const combinationsList = document.getElementById('combinationsList');
-                explanationsList.innerHTML = '';
-                combinationsList.innerHTML = '';
-
-                if (data.explanations && data.explanations.length > 0) {
-                    data.explanations.forEach(explanation => {
-                        const li = document.createElement('li');
-                        li.textContent = explanation;
-                        explanationsList.appendChild(li);
-                    });
+                if (!response.ok) {
+                    addMessage(`Error: ${data.error || 'Failed to convert text'}`, 'bot');
+                    return;
                 }
-
-                if (data.combinations && data.combinations.length > 0) {
-                    data.combinations.forEach(combination => {
-                        const li = document.createElement('li');
-                        li.textContent = combination;
-                        combinationsList.appendChild(li);
-                    });
-                }
-
+                
+                // Add bot response with converted text
+                const convertedText = data.after || 'No conversion result';
+                addMessage(convertedText, 'bot', data.explanations, data.combinations);
+                
             } catch (error) {
                 console.error('Conversion error:', error);
-                showError(error.message || 'Failed to convert text');
+                // Remove loading indicator and show error
+                if (chatMessages.contains(loadingIndicator)) {
+                    chatMessages.removeChild(loadingIndicator);
+                }
+                addMessage(`Error: ${error.message || 'Failed to convert text'}`, 'bot');
             }
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            document.getElementById('result').style.display = 'none';
-        }
-
-        async function playText(elementId, variant = 'br') {
-            let text;
-            if (elementId === 'inputText') {
-                // Play the original input text
-                text = document.getElementById('inputText').value;
-            } else {
-                // Play the text from the specified element
-                text = document.getElementById(elementId).textContent;
-            }
-            if (!text) return;
             
-            try {
-                const response = await fetch(`${API_BASE}/api/tts`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'audio/wav'
-                    },
-                    body: JSON.stringify({ text, variant })
-                });
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addMessage(text, sender, explanations = [], combinations = []) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            
+            // If there are explanations or combinations, create toggle button and explanation section
+            if ((explanations && explanations.length > 0) || (combinations && combinations.length > 0)) {
+                const messageContainer = document.createElement('div');
+                messageContainer.style.display = 'flex';
+                messageContainer.style.flexDirection = 'column';
+                messageContainer.style.alignSelf = sender === 'user' ? 'flex-end' : 'flex-start';
                 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to generate speech');
+                messageContainer.appendChild(messageDiv);
+                
+                // Add toggle button for explanations
+                const toggleButton = document.createElement('button');
+                toggleButton.className = 'toggle-explanations';
+                toggleButton.textContent = 'Show details';
+                toggleButton.onclick = function() {
+                    const explanationDiv = this.nextElementSibling;
+                    if (explanationDiv.style.display === 'none') {
+                        explanationDiv.style.display = 'block';
+                        this.textContent = 'Hide details';
+                    } else {
+                        explanationDiv.style.display = 'none';
+                        this.textContent = 'Show details';
+                    }
+                };
+                
+                messageContainer.appendChild(toggleButton);
+                
+                // Create explanation div
+                const explanationDiv = document.createElement('div');
+                explanationDiv.className = 'message-explanation';
+                explanationDiv.style.display = 'none';
+                
+                // Add word transformations
+                if (explanations && explanations.length > 0) {
+                    const transformTitle = document.createElement('h4');
+                    transformTitle.textContent = 'Word Transformations:';
+                    explanationDiv.appendChild(transformTitle);
+                    
+                    const ul = document.createElement('ul');
+                    explanations.forEach(exp => {
+                        if (exp !== "No changes needed") {
+                            const li = document.createElement('li');
+                            li.textContent = exp;
+                            ul.appendChild(li);
+                        }
+                    });
+                    explanationDiv.appendChild(ul);
                 }
                 
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
+                // Add combinations
+                if (combinations && combinations.length > 0) {
+                    const combTitle = document.createElement('h4');
+                    combTitle.textContent = 'Word Combinations:';
+                    explanationDiv.appendChild(combTitle);
+                    
+                    const ul = document.createElement('ul');
+                    combinations.forEach(comb => {
+                        const li = document.createElement('li');
+                        li.textContent = comb;
+                        ul.appendChild(li);
+                    });
+                    explanationDiv.appendChild(ul);
+                }
                 
-                // Clean up the URL after playing
-                audio.onended = () => URL.revokeObjectURL(audioUrl);
-                
-                await audio.play();
-            } catch (error) {
-                console.error('Error playing audio:', error);
-                alert('Failed to play audio: ' + error.message);
+                messageContainer.appendChild(explanationDiv);
+                chatMessages.appendChild(messageContainer);
+            } else {
+                chatMessages.appendChild(messageDiv);
             }
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     </script>
 </body>
