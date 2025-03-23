@@ -72,24 +72,24 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     lword = word.lower()
     
     # Special handling for não before verbs
-    if lword in ["não", "nao", "nãun", "nãu", "nau", "no"]:
+    if lword in ["não", "nao", "nãun", "nãu", "nau"]:
         if next_word:
             pronouns = ["me", "te", "se", "nos", "vos", "lhe", "lhes", "o", "a", "os",
                        "as", "lo", "la", "los", "las", "no", "na", "nos", "nas", "já"]
             if next_word.lower() in pronouns:
                 if next_next_word and is_verb(next_next_word):
-                    return preserve_capital(word, "nu"), "Negation before pronoun+verb: não → num"
+                    return preserve_capital(word, "nu"), "Negation before pronoun+verb: não → nu"
                 elif is_verb(next_word):
-                    return preserve_capital(word, "nu"), "Negation before verb: não → num"
+                    return preserve_capital(word, "nu"), "Negation before verb: não → nu"
             elif is_verb(next_word):
-                return preserve_capital(word, "nu"), "Negation before verb: não → num"
+                return preserve_capital(word, "nu"), "Negation before verb: não → nu"
         return preserve_capital(word, "nãu"), "Default negation: não → nãu"
 
     # Special handling for você/vocês before verbs
     if lword in ["você", "voce"]:
         if next_word:
             pronouns = ["me", "te", "se", "nos", "vos", "lhe", "lhes", "o", "a", "os",
-                       "as", "lo", "la", "los", "las", "no", "na", "nos", "nas", "já"]
+                       "as", "lo", "la", "los", "las", "no", "na", "nos", "nas", "já", "não", "nao", "nãun", "nãu", "nau"]
             if next_word.lower() in pronouns:
                 if next_next_word and is_verb(next_next_word):
                     return preserve_capital(word, "cê"), "Pronoun before pronoun+verb: você → cê"
@@ -102,7 +102,7 @@ def apply_phonetic_rules(word, next_word=None, next_next_word=None, prev_word=No
     if lword in ["vocês", "voces", "vocêis"]:
         if next_word:
             pronouns = ["me", "te", "se", "nos", "vos", "lhe", "lhes", "o", "a", "os",
-                       "as", "lo", "la", "los", "las", "no", "na", "nos", "nas", "já"]
+                       "as", "lo", "la", "los", "las", "no", "na", "nos", "nas", "já", "não", "nao", "nãun", "nãu", "nau"]
             if next_word.lower() in pronouns:
                 if next_next_word and is_verb(next_next_word):
                     return preserve_capital(word, "cêis"), "Pronoun before pronoun+verb: vocês → cêis"
