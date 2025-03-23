@@ -11,7 +11,16 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
-twilio = TwilioHandler()
+
+# Try to initialize Twilio, but continue even if it fails
+try:
+    twilio = TwilioHandler()
+    twilio_enabled = True
+    logger.info("Twilio successfully initialized")
+except ValueError as e:
+    logger.warning(f"Twilio initialization failed: {e}")
+    twilio = None
+    twilio_enabled = False
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -56,6 +65,10 @@ def text_to_speech():
 @app.route('/webhook/twilio', methods=['POST'])
 def twilio_webhook():
     try:
+        if not twilio_enabled:
+            logger.warning("Twilio webhook called but Twilio is not configured")
+            return jsonify({'error': 'Twilio is not configured'}), 503
+        
         twilio.handle_message(request.form)
         return '', 200
     except Exception as e:
