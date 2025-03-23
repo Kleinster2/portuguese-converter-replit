@@ -38,7 +38,7 @@ COGNITIVE_VERB_ROOTS = {
     "ach", "acontec", "acredit", "adivinh", "ador", "admir", "admit", "afirm",
     "agrad", "aguent", "alcanç", "amanhec", "am", "analis", "anot", "aprend",
     "apresent", "assist", "assum", "chec", "coment", "comet", "compar",
-    "concord", "conhec", "consegu", "consig", "consist", "consent", "consult",
+    "concord", "conhec", "consegu", "consig", "consider", "consist", "consent", "consult",
     "contempl", "cont", "convers", "decid", "defend", "defin", "demor",
     "depend", "desej", "desenh", "desenvolv", "descobr", "desist", "dirig",
     "discut", "divid", "entend", "esper", "esquec", "esqueç", "estud", "evit",
