@@ -63,7 +63,6 @@ IRREGULAR_VERBS = {
     "vimos": "vimu",
     "vêm": "vêin",
     "veio": "vêiu",
-    "veio": "vêiu",
     "vieram": "vierãu",
     "vinha": "vinha",
     "vinham": "vinhaum",
