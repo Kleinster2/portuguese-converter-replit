@@ -3,6 +3,7 @@ from flask_cors import CORS
 from portuguese_converter import convert_text
 from tts_converter import TTSConverter
 from twilio_handler import TwilioHandler
+from llm_processor import LLMProcessor
 import logging
 
 # Configure logging
@@ -21,6 +22,9 @@ except ValueError as e:
     logger.warning(f"Twilio initialization failed: {e}")
     twilio = None
     twilio_enabled = False
+
+# Initialize LLM processor
+llm_processor = LLMProcessor()
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -60,6 +64,60 @@ def text_to_speech():
 
     except Exception as e:
         logger.error(f"Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/correct_text', methods=['POST'])
+def correct_text():
+    """Endpoint for correcting typos, syntax, and grammar with LLM"""
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
+
+        text = data['text']
+        corrected_text, message = llm_processor.correct_text(text)
+        
+        return jsonify({
+            'original': text,
+            'corrected': corrected_text,
+            'message': message
+        })
+    except Exception as e:
+        logger.error(f"Error in text correction: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/process_text', methods=['POST'])
+def process_text():
+    """Combined endpoint for correction and conversion"""
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
+
+        text = data['text']
+        apply_correction = data.get('correct', False)
+        apply_conversion = data.get('convert', False)
+        
+        result = {'original': text}
+        
+        # Step 1: Correct text if requested
+        if apply_correction:
+            corrected_text, correction_message = llm_processor.correct_text(text)
+            result['corrected'] = corrected_text
+            result['correction_message'] = correction_message
+            # Use corrected text for next step if available
+            text_for_conversion = corrected_text
+        else:
+            text_for_conversion = text
+        
+        # Step 2: Convert to colloquial Portuguese if requested
+        if apply_conversion:
+            conversion_result = convert_text(text_for_conversion)
+            result['conversion'] = conversion_result
+        
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in process_text: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/webhook/twilio', methods=['POST'])
