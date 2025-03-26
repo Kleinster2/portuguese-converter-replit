@@ -86,6 +86,26 @@ def correct_text():
         logger.error(f"Error in text correction: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/transform_colloquial', methods=['POST'])
+def transform_colloquial():
+    """Endpoint for transforming text to colloquial Portuguese using LLM"""
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
+
+        text = data['text']
+        colloquial_text, message = llm_processor.transform_to_colloquial(text)
+        
+        return jsonify({
+            'original': text,
+            'colloquial': colloquial_text,
+            'message': message
+        })
+    except Exception as e:
+        logger.error(f"Error in colloquial transformation: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/process_text', methods=['POST'])
 def process_text():
     """Combined endpoint for correction and conversion"""
@@ -97,6 +117,7 @@ def process_text():
         text = data['text']
         apply_correction = data.get('correct', False)
         apply_conversion = data.get('convert', False)
+        use_llm_conversion = data.get('use_llm', False)
         
         result = {'original': text}
         
@@ -112,8 +133,19 @@ def process_text():
         
         # Step 2: Convert to colloquial Portuguese if requested
         if apply_conversion:
-            conversion_result = convert_text(text_for_conversion)
-            result['conversion'] = conversion_result
+            if use_llm_conversion:
+                # Use LLM-based transformation
+                colloquial_text, conversion_message = llm_processor.transform_to_colloquial(text_for_conversion)
+                result['conversion'] = {
+                    'text': colloquial_text,
+                    'llm_based': True,
+                    'message': conversion_message
+                }
+            else:
+                # Use rule-based transformation
+                conversion_result = convert_text(text_for_conversion)
+                result['conversion'] = conversion_result
+                result['conversion']['llm_based'] = False
         
         return jsonify(result)
     except Exception as e:
