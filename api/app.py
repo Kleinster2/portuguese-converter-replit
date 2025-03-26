@@ -149,6 +149,8 @@ def process_text():
         
         return jsonify(result)
     except Exception as e:
+        logger.error(f"Error in process_text: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
