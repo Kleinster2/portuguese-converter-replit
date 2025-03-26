@@ -122,7 +122,7 @@ class LLMProcessor:
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. Encourage users to try writing in Portuguese so they can see the colloquial conversion. Be friendly and helpful, and explain that you're here to help convert formal Portuguese to colloquial Brazilian Portuguese."},
+                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. You can chat about any topic and respond to questions. Users can ask you to transform formal Portuguese text into colloquial Brazilian Portuguese by using commands like 'transform' or 'convert'. Be friendly and helpful, and occasionally remind users of your transformation capability. You should detect if the user is asking for a transformation or just having a normal conversation."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7

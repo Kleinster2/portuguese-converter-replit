@@ -151,14 +151,16 @@
             <p>Type in standard Portuguese, get back colloquial speech!</p>
         </div>
 
-        <div class="mode-selector">
-            <button id="basic-mode" class="mode-button active">Basic Mode</button>
-            <button id="interactive-mode" class="mode-button">Interactive LLM Mode</button>
-        </div>
 
         <div id="chat-messages" class="chat-messages">
             <div class="message bot-message">
-                Hello! Choose a mode to get started.
+                Olá! I'm your Portuguese language assistant. 
+            </div>
+            <div class="message info-message">
+                You can chat with me in any language. If you want to convert text to colloquial Brazilian Portuguese, just ask me to "transform" or "convert" your text.
+            </div>
+            <div class="message bot-message">
+                Try writing something in Portuguese like "Bom dia, como está você?" or ask me to transform a phrase!
             </div>
         </div>
 
@@ -173,11 +175,7 @@
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-button');
-        const basicModeBtn = document.getElementById('basic-mode');
-        const interactiveModeBtn = document.getElementById('interactive-mode');
 
-        // Current mode (basic or interactive)
-        let currentMode = 'basic';
 
         // Function to add a message to the chat
         function addMessage(text, sender) {
@@ -188,20 +186,6 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Mode switching
-        basicModeBtn.addEventListener('click', () => {
-            currentMode = 'basic';
-            basicModeBtn.classList.add('active');
-            interactiveModeBtn.classList.remove('active');
-            addMessage("Basic mode activated. Type Portuguese text to see the colloquial conversion.", 'info');
-        });
-
-        interactiveModeBtn.addEventListener('click', () => {
-            currentMode = 'interactive';
-            interactiveModeBtn.classList.add('active');
-            basicModeBtn.classList.remove('active');
-            addMessage("Interactive LLM mode activated! You can chat directly with the AI. It will detect Portuguese text and show you the colloquial version.", 'info');
-        });
 
         // Function to send user message to backend based on current mode
         async function sendMessage() {
@@ -223,15 +207,10 @@
             try {
                 let endpoint, data;
 
-                if (currentMode === 'basic') {
-                    // Basic mode - use the rule-based converter
-                    endpoint = `${API_BASE}/api/portuguese_converter`;
-                    data = { text: inputText };
-                } else {
-                    // Interactive mode - use the LLM chat endpoint
-                    endpoint = `${API_BASE}/api/ask_llm`;
-                    data = { text: inputText };
-                }
+                //Always use the LLM endpoint
+                endpoint = `${API_BASE}/api/ask_llm`;
+                data = { text: inputText };
+
 
                 const response = await fetch(endpoint, {
                     method: 'POST',
@@ -262,27 +241,16 @@
                     return;
                 }
 
-                if (currentMode === 'basic') {
-                    // Process basic mode response
-                    const convertedText = responseData.after;
-                    addMessage(convertedText, 'bot');
 
-                    // Add explanations if they exist
-                    if (responseData.explanations && responseData.explanations.length > 0) {
-                        const explanationsText = responseData.explanations.join('\n');
-                        addMessage(`Explanations:\n${explanationsText}`, 'info');
-                    }
-                } else {
-                    // Process interactive mode response
-                    addMessage(responseData.response, 'bot');
+                // Process interactive mode response
+                addMessage(responseData.response, 'bot');
 
-                    // If Portuguese was detected, show the colloquial version
-                    if (responseData.is_portuguese && responseData.colloquial) {
-                        addMessage(`Colloquial version (LLM): ${responseData.colloquial}`, 'info');
+                // If Portuguese was detected, show the colloquial version
+                if (responseData.is_portuguese && responseData.colloquial) {
+                    addMessage(`Colloquial version (LLM): ${responseData.colloquial}`, 'info');
 
-                        if (responseData.rule_based) {
-                            addMessage(`Colloquial version (Rule-based): ${responseData.rule_based}`, 'info');
-                        }
+                    if (responseData.rule_based) {
+                        addMessage(`Colloquial version (Rule-based): ${responseData.rule_based}`, 'info');
                     }
                 }
 

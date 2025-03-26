@@ -149,6 +149,89 @@ def process_text():
         
         return jsonify(result)
     except Exception as e:
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    """
+    Unified endpoint for all chat interactions.
+    The LLM will interact with the user and handle transformation requests when needed.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
+
+        user_text = data['text']
+        
+        # Check if this is a request to transform text
+        transform_keywords = ['transform', 'convert', 'colloquial', 'informal', 'brazilian portuguese']
+        is_transform_request = any(keyword in user_text.lower() for keyword in transform_keywords)
+        
+        if is_transform_request:
+            # Extract the text to be transformed
+            # First, try to identify if there's a specific text to transform
+            response = llm_processor.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": "You are an assistant that identifies text to be transformed. If the user wants to transform text to colloquial Brazilian Portuguese, extract the exact text they want to transform. If no specific text is identified, respond with 'NO_TEXT'."},
+                    {"role": "user", "content": user_text}
+                ],
+                temperature=0.1
+            )
+            
+            extracted_text = response.choices[0].message.content
+            
+            if extracted_text != "NO_TEXT":
+                # If specific text was identified, transform it
+                llm_transformed, _ = llm_processor.transform_to_colloquial(extracted_text)
+                
+                # Also apply rule-based transformation for comparison
+                rule_based = convert_text(extracted_text)
+                
+                # Get the LLM to create a response about the transformation
+                explanation_response = llm_processor.client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant explaining Portuguese text transformation. Respond in a friendly, conversational way. Mention that you're showing both LLM and rule-based transformations."},
+                        {"role": "user", "content": f"The user wants to transform this text: '{extracted_text}'"}
+                    ],
+                    temperature=0.7
+                )
+                
+                return jsonify({
+                    'response': explanation_response.choices[0].message.content,
+                    'transformation': {
+                        'original': extracted_text,
+                        'llm': llm_transformed,
+                        'rule_based': rule_based['after']
+                    }
+                })
+            else:
+                # If no specific text identified, ask for it
+                return jsonify({
+                    'response': "I'd be happy to transform text to colloquial Brazilian Portuguese! Please provide the text you'd like me to transform."
+                })
+        else:
+            # Regular chat interaction - detect Portuguese and show transformation if applicable
+            response, is_portuguese, colloquial_version = llm_processor.ask_question(user_text)
+            
+            result = {
+                'response': response
+            }
+            
+            # Include transformation if Portuguese was detected and this isn't a command/question
+            if is_portuguese and len(user_text.split()) > 3 and not user_text.endswith('?'):
+                result['transformation'] = {
+                    'llm': colloquial_version,
+                    'rule_based': convert_text(user_text)['after']
+                }
+            
+            return jsonify(result)
+            
+    except Exception as e:
+        logger.error(f"Error in chat endpoint: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
         logger.error(f"Error in process_text: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
