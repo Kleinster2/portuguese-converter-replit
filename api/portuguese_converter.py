@@ -169,10 +169,14 @@ def tokenize_text(text):
     for match in re.finditer(pattern, text):
         word = match.group(1)
         punct = match.group(2)
+        hyphen = match.group(3)
+        
         if word:
             tokens.append((word, ''))  # (word, "")
         elif punct:
             tokens.append(('', punct))  # ("", punctuation)
+        elif hyphen:
+            tokens.append(('', hyphen))  # ("", hyphen)
 
     return tokens
 
@@ -207,7 +211,7 @@ def reassemble_tokens_smartly(final_tokens):
                 output.append(word)
             else:
                 # Check if previous token was a hyphen
-                prev_punct = final_tokens[i-1][1] if i > 0 else ""
+                prev_word, prev_punct = final_tokens[i-1] if i > 0 else ("", "")
                 if prev_punct == "-":
                     # If previous token was a hyphen, don't add space
                     output.append(word)
