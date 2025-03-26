@@ -3,6 +3,7 @@
 # -*- coding: utf-8 -*-
 
 WORD_PAIRS = {
+    "bem-estar": "bein-está",
     "a gente": "agenti",
     "por que": "purkê",
     "por quê": "purkê",
