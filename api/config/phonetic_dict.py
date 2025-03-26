@@ -134,7 +134,7 @@ PHONETIC_DICTIONARY = {
     'ali': 'alí',
     'aqui': 'akí',
     'atrás': 'atráyz',
-    'bem': 'beyn',
+    'bem': 'bein',
     'depois': 'dipois',
     'empresa': 'impreza',
     'empresas': 'imprezas',
