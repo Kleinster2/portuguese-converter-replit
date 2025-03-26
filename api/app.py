@@ -152,6 +152,37 @@ def process_text():
         logger.error(f"Error in process_text: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/ask_llm', methods=['POST'])
+def ask_llm():
+    """Interactive endpoint for LLM chat with Portuguese detection"""
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
+
+        user_text = data['text']
+        
+        # Process the user's text with the LLM
+        response, is_portuguese, colloquial_version = llm_processor.ask_question(user_text)
+        
+        result = {
+            'response': response,
+            'is_portuguese': is_portuguese
+        }
+        
+        # Include colloquial version if Portuguese was detected
+        if is_portuguese and colloquial_version:
+            result['colloquial'] = colloquial_version
+            
+            # Also include rule-based transformation for comparison
+            rule_based = convert_text(user_text)
+            result['rule_based'] = rule_based['after']
+        
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in ask_llm: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/webhook/twilio', methods=['POST'])
 def twilio_webhook():
     try:

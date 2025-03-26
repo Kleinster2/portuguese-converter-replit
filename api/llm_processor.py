@@ -74,3 +74,62 @@ class LLMProcessor:
         except Exception as e:
             logger.error(f"Error in transform_to_colloquial: {str(e)}")
             return text, f"Error: {str(e)}"
+            
+    def ask_question(self, question):
+        """
+        Interactive chat with LLM that detects Portuguese text and converts it if needed
+        
+        Args:
+            question (str): User's input text/question
+            
+        Returns:
+            tuple: (response_text, has_portuguese, colloquial_version)
+        """
+        if not self.client:
+            return "Sorry, API key not configured.", False, None
+            
+        try:
+            # First determine if the text contains Portuguese
+            detect_response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": "You are a language detection assistant. Your only job is to determine if text contains Portuguese. Respond with 'YES' if the text is in Portuguese (even partially), and 'NO' if it's not."},
+                    {"role": "user", "content": question}
+                ],
+                temperature=0.1
+            )
+            
+            is_portuguese = "YES" in detect_response.choices[0].message.content.upper()
+            
+            # Generate appropriate response based on input
+            if is_portuguese:
+                # If Portuguese, provide both the answer and the colloquial conversion
+                response = self.client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant that recognizes Portuguese input. Answer questions in the same language they're asked. If the user provides Portuguese text, respond briefly in Portuguese but don't convert it to colloquial form - that will be done separately. Always be friendly and encourage users to try Portuguese phrases for conversion."},
+                        {"role": "user", "content": question}
+                    ],
+                    temperature=0.7
+                )
+                
+                # Convert the Portuguese text to colloquial form
+                colloquial_text, _ = self.transform_to_colloquial(question)
+                
+                return response.choices[0].message.content, True, colloquial_text
+            else:
+                # If not Portuguese, just respond normally
+                response = self.client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. Encourage users to try writing in Portuguese so they can see the colloquial conversion. Be friendly and helpful, and explain that you're here to help convert formal Portuguese to colloquial Brazilian Portuguese."},
+                        {"role": "user", "content": question}
+                    ],
+                    temperature=0.7
+                )
+                
+                return response.choices[0].message.content, False, None
+                
+        except Exception as e:
+            logger.error(f"Error in ask_question: {str(e)}")
+            return f"Error: {str(e)}", False, None
