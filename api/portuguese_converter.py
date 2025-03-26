@@ -158,10 +158,12 @@ def tokenize_text(text):
     Capture words vs. punctuation lumps in a single pass.
     - ([A-Za-zÀ-ÖØ-öø-ÿ0-9]+): words (including accented or numeric characters).
     - ([.,!?;:]+): one or more punctuation marks.
+    - (-): hyphens are captured separately to preserve them
     Returns a list of (word, punct) tuples, e.g.:
         "Olá, mundo!" => [("Olá", ""), ("", ","), ("mundo", ""), ("", "!")]
+        "bem-vindo" => [("bem", ""), ("", "-"), ("vindo", "")]
     """
-    pattern = r'([A-Za-zÀ-ÖØ-öø-ÿ0-9]+)|([.,!?;:]+)'
+    pattern = r'([A-Za-zÀ-ÖØ-öø-ÿ0-9]+)|([.,!?;:]+)|(-)'
     tokens = []
 
     for match in re.finditer(pattern, text):
