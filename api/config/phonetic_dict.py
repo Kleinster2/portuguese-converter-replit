@@ -176,6 +176,7 @@ PHONETIC_DICTIONARY = {
     'bonitos': 'bunitus',
     'olho': 'ôliu',
     'olhos': 'ôlius',
+    'bem-estar': 'bein-está',
     'menino': 'mininu',
     'menina': 'minina',
     'meninas': 'mininas',
