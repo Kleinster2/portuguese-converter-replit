@@ -156,13 +156,12 @@ def merge_word_pairs(tokens):
 def tokenize_text(text):
     """
     Capture words vs. punctuation lumps in a single pass.
-    - ([A-Za-zÀ-ÖØ-öø-ÿ0-9]+(?:-[A-Za-zÀ-ÖØ-öø-ÿ0-9]+)*): words (including hyphenated, accented, or numeric characters).
-    - ([^A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+): one or more punctuation marks or special characters.
+    - ([A-Za-zÀ-ÖØ-öø-ÿ0-9]+): words (including accented or numeric characters).
+    - ([.,!?;:]+): one or more punctuation marks.
     Returns a list of (word, punct) tuples, e.g.:
         "Olá, mundo!" => [("Olá", ""), ("", ","), ("mundo", ""), ("", "!")]
-        "bem-vindo" => [("bem-vindo", "")]
     """
-    pattern = r'([A-Za-zÀ-ÖØ-öø-ÿ0-9]+(?:-[A-Za-zÀ-ÖØ-öø-ÿ0-9]+)*)|([^A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+)'
+    pattern = r'([A-Za-zÀ-ÖØ-öø-ÿ0-9]+)|([.,!?;:]+)'
     tokens = []
 
     for match in re.finditer(pattern, text):
