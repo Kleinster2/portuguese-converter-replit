@@ -77,7 +77,8 @@ class LLMProcessor:
             
     def ask_question(self, question):
         """
-        Interactive chat with LLM that detects Portuguese text and converts it if needed
+        Interactive chat with LLM that detects Portuguese text and converts it if needed,
+        but always responds in English
         
         Args:
             question (str): User's input text/question
@@ -101,13 +102,13 @@ class LLMProcessor:
             
             is_portuguese = "YES" in detect_response.choices[0].message.content.upper()
             
-            # Generate appropriate response based on input
+            # Always respond in English
             if is_portuguese:
-                # If Portuguese, provide both the answer and the colloquial conversion
+                # If Portuguese input, respond in English and still provide the conversion
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant that recognizes Portuguese input. Answer questions in the same language they're asked. If the user provides Portuguese text, respond briefly in Portuguese but don't convert it to colloquial form - that will be done separately. Always be friendly and encourage users to try Portuguese phrases for conversion."},
+                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. Even when users type in Portuguese, you ALWAYS respond in English. If the user provides Portuguese text, respond to them in English and let them know you've provided a colloquial transformation of their text. Be friendly and encouraging."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
@@ -118,11 +119,11 @@ class LLMProcessor:
                 
                 return response.choices[0].message.content, True, colloquial_text
             else:
-                # If not Portuguese, just respond normally
+                # If not Portuguese, just respond normally in English
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. You can chat about any topic and respond to questions. Users can ask you to transform formal Portuguese text into colloquial Brazilian Portuguese by using commands like 'transform' or 'convert'. Be friendly and helpful, and occasionally remind users of your transformation capability. You should detect if the user is asking for a transformation or just having a normal conversation."},
+                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language transformation. You can chat about any topic in English and respond to questions. Users can ask you to transform formal Portuguese text into colloquial Brazilian Portuguese by using commands like 'transform' or 'convert'. Be friendly and helpful, and occasionally remind users of your transformation capability. Always respond in English."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7

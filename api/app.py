@@ -76,7 +76,7 @@ def correct_text():
 
         text = data['text']
         corrected_text, message = llm_processor.correct_text(text)
-        
+
         return jsonify({
             'original': text,
             'corrected': corrected_text,
@@ -96,7 +96,7 @@ def transform_colloquial():
 
         text = data['text']
         colloquial_text, message = llm_processor.transform_to_colloquial(text)
-        
+
         return jsonify({
             'original': text,
             'colloquial': colloquial_text,
@@ -118,9 +118,9 @@ def process_text():
         apply_correction = data.get('correct', False)
         apply_conversion = data.get('convert', False)
         use_llm_conversion = data.get('use_llm', False)
-        
+
         result = {'original': text}
-        
+
         # Step 1: Correct text if requested
         if apply_correction:
             corrected_text, correction_message = llm_processor.correct_text(text)
@@ -130,7 +130,7 @@ def process_text():
             text_for_conversion = corrected_text
         else:
             text_for_conversion = text
-        
+
         # Step 2: Convert to colloquial Portuguese if requested
         if apply_conversion:
             if use_llm_conversion:
@@ -146,7 +146,7 @@ def process_text():
                 conversion_result = convert_text(text_for_conversion)
                 result['conversion'] = conversion_result
                 result['conversion']['llm_based'] = False
-        
+
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error in process_text: {str(e)}")
@@ -164,11 +164,11 @@ def chat():
             return jsonify({'error': 'No text provided'}), 400
 
         user_text = data['text']
-        
+
         # Check if this is a request to transform text
         transform_keywords = ['transform', 'convert', 'colloquial', 'informal', 'brazilian portuguese']
         is_transform_request = any(keyword in user_text.lower() for keyword in transform_keywords)
-        
+
         if is_transform_request:
             # Extract the text to be transformed
             # First, try to identify if there's a specific text to transform
@@ -180,16 +180,16 @@ def chat():
                 ],
                 temperature=0.1
             )
-            
+
             extracted_text = response.choices[0].message.content
-            
+
             if extracted_text != "NO_TEXT":
                 # If specific text was identified, transform it
                 llm_transformed, _ = llm_processor.transform_to_colloquial(extracted_text)
-                
+
                 # Also apply rule-based transformation for comparison
                 rule_based = convert_text(extracted_text)
-                
+
                 # Get the LLM to create a response about the transformation
                 explanation_response = llm_processor.client.chat.completions.create(
                     model="gpt-4o",
@@ -199,7 +199,7 @@ def chat():
                     ],
                     temperature=0.7
                 )
-                
+
                 return jsonify({
                     'response': explanation_response.choices[0].message.content,
                     'transformation': {
@@ -209,33 +209,31 @@ def chat():
                     }
                 })
             else:
-                # If no specific text identified, ask for it
+                # If no specific text identified, ask for it (in English)
                 return jsonify({
-                    'response': "I'd be happy to transform text to colloquial Brazilian Portuguese! Please provide the text you'd like me to transform."
+                    'response': "I'd be happy to transform Portuguese text to colloquial Brazilian Portuguese! Please provide the text you'd like me to transform."
                 })
         else:
             # Regular chat interaction - detect Portuguese and show transformation if applicable
             response, is_portuguese, colloquial_version = llm_processor.ask_question(user_text)
-            
+
             result = {
                 'response': response
             }
-            
+
             # Include transformation if Portuguese was detected and this isn't a command/question
             if is_portuguese and len(user_text.split()) > 3 and not user_text.endswith('?'):
                 result['transformation'] = {
                     'llm': colloquial_version,
                     'rule_based': convert_text(user_text)['after']
                 }
-            
+
             return jsonify(result)
-            
+
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-        logger.error(f"Error in process_text: {str(e)}")
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/ask_llm', methods=['POST'])
 def ask_llm():
@@ -246,23 +244,23 @@ def ask_llm():
             return jsonify({'error': 'No text provided'}), 400
 
         user_text = data['text']
-        
+
         # Process the user's text with the LLM
         response, is_portuguese, colloquial_version = llm_processor.ask_question(user_text)
-        
+
         result = {
             'response': response,
             'is_portuguese': is_portuguese
         }
-        
+
         # Include colloquial version if Portuguese was detected
         if is_portuguese and colloquial_version:
             result['colloquial'] = colloquial_version
-            
+
             # Also include rule-based transformation for comparison
             rule_based = convert_text(user_text)
             result['rule_based'] = rule_based['after']
-        
+
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error in ask_llm: {str(e)}")
@@ -274,7 +272,7 @@ def twilio_webhook():
         if not twilio_enabled:
             logger.warning("Twilio webhook called but Twilio is not configured")
             return jsonify({'error': 'Twilio is not configured'}), 503
-        
+
         twilio.handle_message(request.form)
         return '', 200
     except Exception as e:
