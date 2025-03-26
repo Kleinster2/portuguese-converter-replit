@@ -43,5 +43,5 @@ task = "shell.exec"
 args = "python api/app.py"
 
 [[ports]]
-localPort = 3000
+localPort = 3001
 externalPort = 80
