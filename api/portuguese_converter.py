@@ -185,24 +185,41 @@ def reassemble_tokens_smartly(final_tokens):
     Example final_tokens could be: [("Olá", ""), ("", ","), ("mundo", ""), ("", "!")]
     We want to get: "Olá, mundo!"
 
+    Example with hyphen: [("bem", ""), ("", "-"), ("vindo", "")]
+    We want to get: "bem-vindo"
+
     Logic:
       - If 'word' is non-empty, append it to output (with a leading space if it's not the first).
-      - If 'punct' is non-empty, append it directly (no leading space).
+      - If 'punct' is non-empty:
+        - If it's a hyphen, append it directly (no leading space)
+        - Otherwise, append it directly (no leading space).
+      - Special case: if punctuation is a hyphen and followed by a word, don't add space after hyphen
     """
     output = []
-    for (word, punct) in final_tokens:
+    i = 0
+    while i < len(final_tokens):
+        word, punct = final_tokens[i]
+        
         # If there's a word
         if word:
             if not output:
                 # First token => add the word as is
                 output.append(word)
             else:
-                # Not the first => prepend space before the word
-                output.append(" " + word)
+                # Check if previous token was a hyphen
+                prev_punct = final_tokens[i-1][1] if i > 0 else ""
+                if prev_punct == "-":
+                    # If previous token was a hyphen, don't add space
+                    output.append(word)
+                else:
+                    # Not the first and not after hyphen => prepend space
+                    output.append(" " + word)
 
         # If there's punctuation => attach immediately (no space)
         if punct:
             output.append(punct)
+            
+        i += 1
 
     # Join everything into a single string
     return "".join(output)
