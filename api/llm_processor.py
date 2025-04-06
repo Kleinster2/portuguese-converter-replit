@@ -182,6 +182,9 @@ Express origin:
             )
 
             is_portuguese = "YES" in detect_response.choices[0].message.content.upper()
+            
+            # Additional instruction to focus strictly on the curriculum sequence
+            sequence_instruction = "IMPORTANT: Never invite the user to divert from the established learning sequence. Always stay focused on offering the next step in the syllabus process. Only move forward once the user demonstrates understanding of the current topic."
 
             # Always respond in English
             if is_portuguese:
@@ -211,7 +214,7 @@ Express origin:
                         next_subtopic = "A"  # Cycle back to beginning if we're at the end
                 
                 # If Portuguese input, respond in English and still provide the conversion
-                system_prompt = self.portuguese_tutor_prompt
+                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
                 if has_demonstrated:
                     # Add instruction to invite to next topic when user has demonstrated current one
                     if next_subtopic:
@@ -221,7 +224,7 @@ Express origin:
                             "C": "expressing residence with 'Eu moro em [city]'",
                             "D": "expressing language with 'Eu falo [language]'"
                         }
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then ask if they would like to continue to the next topic: {next_topic_names[next_subtopic]}. Do not provide an example of the next topic yet - wait for user confirmation first."
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then ask if they would like to continue to the next topic: {next_topic_names[next_subtopic]}. Do not provide an example of the next topic yet - wait for user confirmation first. Do not suggest alternate topics or allow diverting from the sequence."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
@@ -245,7 +248,7 @@ Express origin:
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": self.portuguese_tutor_prompt},
+                        {"role": "system", "content": self.portuguese_tutor_prompt + "\n\n" + sequence_instruction},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
