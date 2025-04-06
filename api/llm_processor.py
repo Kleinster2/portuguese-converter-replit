@@ -196,26 +196,45 @@ Express origin:
                 
                 current_pattern = subtopics[self.current_subtopic][0].lower()
                 # If user demonstrated the current topic, we can advance next time
-                if current_pattern in question.lower():
+                has_demonstrated = current_pattern in question.lower()
+                next_subtopic = None
+                
+                if has_demonstrated:
                     # Prepare to advance to next subtopic on next agreement
                     if self.current_subtopic == "A":
-                        self.current_subtopic = "B"
+                        next_subtopic = "B"
                     elif self.current_subtopic == "B":
-                        self.current_subtopic = "C"
+                        next_subtopic = "C"
                     elif self.current_subtopic == "C":
-                        self.current_subtopic = "D"
+                        next_subtopic = "D"
                     else:
-                        self.current_subtopic = "A"  # Cycle back to beginning if we're at the end
+                        next_subtopic = "A"  # Cycle back to beginning if we're at the end
                 
                 # If Portuguese input, respond in English and still provide the conversion
+                system_prompt = self.portuguese_tutor_prompt
+                if has_demonstrated:
+                    # Add instruction to invite to next topic when user has demonstrated current one
+                    if next_subtopic:
+                        next_topic_names = {
+                            "A": "self-introduction with 'Eu sou [name]'",
+                            "B": "expressing origin with 'Eu sou de [city]'",
+                            "C": "expressing residence with 'Eu moro em [city]'",
+                            "D": "expressing language with 'Eu falo [language]'"
+                        }
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then ask if they would like to continue to the next topic: {next_topic_names[next_subtopic]}."
+                
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": self.portuguese_tutor_prompt},
+                        {"role": "system", "content": system_prompt},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
                 )
+                
+                # Only update the current subtopic after generating the response
+                if has_demonstrated and next_subtopic:
+                    self.current_subtopic = next_subtopic
 
                 # Convert the Portuguese text to colloquial form
                 colloquial_text, _ = self.transform_to_colloquial(question)
