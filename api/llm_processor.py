@@ -132,20 +132,42 @@ Express origin:
             return "Sorry, API key not configured.", False, None
 
         try:
-            # Check if the user is showing agreement to start the syllabus
+            # Check if the user is showing agreement to start the syllabus or progress to next topic
             agreement_words = ["yes", "sure", "okay", "ok", "sim", "yes please", "start", "let's start", "begin", 
                               "let's begin", "i agree", "sounds good", "that's good", "i'm ready", "ready"]
 
             user_agreed = question.lower().strip() in agreement_words
-
+            
             if user_agreed:
-                # User agreed, but always ask for explicit confirmation on a specific subtopic
+                # Track progress through the syllabus
+                subtopics = {
+                    "A": "self-introduction with 'Eu sou [name]'",
+                    "B": "expressing origin with 'Eu sou de [city]'",
+                    "C": "expressing residence with 'Eu moro em [city]'",
+                    "D": "expressing language with 'Eu falo [language]'"
+                }
+                
+                # Use the current_subtopic to determine what to teach next
+                current_topic = subtopics[self.current_subtopic]
+                
+                # Move to the next subtopic for the next time
+                if self.current_subtopic == "A":
+                    next_subtopic = "B"
+                elif self.current_subtopic == "B":
+                    next_subtopic = "C"
+                elif self.current_subtopic == "C":
+                    next_subtopic = "D"
+                else:
+                    next_subtopic = "A"  # Cycle back to beginning if we're at the end
+                
+                self.current_subtopic = next_subtopic
+                
+                # Generate response based on current topic
                 syllabus_response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": self.portuguese_tutor_prompt + "\nTeach only ONE small subtopic at a time. Always ask for explicit confirmation before proceeding to the next subtopic. Never combine multiple concepts in one response."},
-                        {"role": "user", "content": "I want to start learning Brazilian Portuguese."},
-                        {"role": "assistant", "content": "Great! Let's start with just the basic greetings in Portuguese. Would you like to learn how to say hello and ask how someone is doing? I'll wait for your confirmation before we begin."},
+                        {"role": "system", "content": self.portuguese_tutor_prompt + f"\nTeach specifically about {current_topic} now. Do not repeat previous topics. Move forward in the syllabus."},
+                        {"role": "user", "content": f"I want to learn about {current_topic} in Brazilian Portuguese."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.5
