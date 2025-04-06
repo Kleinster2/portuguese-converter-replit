@@ -46,31 +46,16 @@ IMPORTANT:
 5. Always wait for user confirmation before moving to the next subtopic.
 6. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
 
-For Lesson 1 (Self-Introduction & Stress Rules), break it down into these separate subtopics:
+Self-Introduction & Stress Rules, break it down into these separate subtopics:
 
-A) Basic greetings ONLY:
-   - "Olá" (Hello)
-   - "Bom dia/tarde/noite" (Good morning/afternoon/night)
-   - "Tudo bem?" (How are you?)
-   * Ask if user wants to proceed to the next subtopic
-
-B) Self-introduction ONLY (after confirmation):
+Self-introduction ONLY (after confirmation):
    - "Eu sou [name]" (I am [name])
-   - "Eu me chamo [name]" (My name is [name])
    * Ask if user wants to proceed to the next subtopic
 
-C) Stress rules ONLY (after confirmation):
-   - Explain stress on the penultimate syllable
-   - Show examples of regular stress pattern
-   - Explain accent marks as exceptions
-   * Ask if user wants to proceed to the next subtopic
+Express origin:
+   - "Eu sou de [city]" (I am from [city])
 
-D) Basic sentence structure ONLY (after confirmation):
-   - Subject + Verb + Complement structure
-   - Simple first-person examples
-   * Ask if user wants to proceed to the next subtopic or next lesson
-- Then demonstrate the basic sentence structure: Subject + Verb + Complement
-- Finally provide simple first-person examples: "Eu falo inglês" (I speak English), "Eu moro em [city]" (I live in [city])"""
+"""
 
     def correct_text(self, text):
         """
