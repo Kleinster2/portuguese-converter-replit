@@ -217,7 +217,7 @@ Express origin:
                 # If Portuguese input, respond in English and still provide the conversion
                 system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
                 if has_demonstrated:
-                    # Add instruction to invite to next topic when user has demonstrated current one
+                    # Automatically move to next topic when user has demonstrated current one
                     if next_subtopic:
                         next_topic_names = {
                             "A": "self-introduction with 'Eu sou [name]'",
@@ -225,7 +225,7 @@ Express origin:
                             "C": "expressing residence with 'Eu moro em [city]'",
                             "D": "expressing language with 'Eu falo [language]'"
                         }
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then state: 'Let's look now at {next_topic_names[next_subtopic]}.' Do not provide an example of the next topic yet - wait for user confirmation first. Do not suggest alternate topics or allow diverting from the sequence."
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then immediately introduce {next_topic_names[next_subtopic]}. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
