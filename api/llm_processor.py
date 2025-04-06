@@ -1,4 +1,3 @@
-
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -15,6 +14,7 @@ class LLMProcessor:
             self.client = None
         else:
             self.client = OpenAI(api_key=self.api_key)
+        self.portuguese_tutor_prompt = "You are a helpful and friendly Brazilian Portuguese tutor. Help the user by correcting the spelling, syntax and grammar of any Portuguese text in the user input that needs correction. Offer to help going thru topics in grammar, or to transform written Portuguese into highly concise spoken Portuguese. For the last one, use our rules-based code. Always respond in English, even when the user writes in Portuguese."
 
     def correct_text(self, text):
         """
@@ -75,21 +75,21 @@ class LLMProcessor:
         except Exception as e:
             logger.error(f"Error in transform_to_colloquial: {str(e)}")
             return text, f"Error: {str(e)}"
-            
+
     def ask_question(self, question):
         """
         Interactive chat with LLM that detects Portuguese text and converts it if needed,
         but always responds in English
-        
+
         Args:
             question (str): User's input text/question
-            
+
         Returns:
             tuple: (response_text, has_portuguese, colloquial_version)
         """
         if not self.client:
             return "Sorry, API key not configured.", False, None
-            
+
         try:
             # First determine if the text contains Portuguese
             detect_response = self.client.chat.completions.create(
@@ -100,38 +100,38 @@ class LLMProcessor:
                 ],
                 temperature=0.1
             )
-            
+
             is_portuguese = "YES" in detect_response.choices[0].message.content.upper()
-            
+
             # Always respond in English
             if is_portuguese:
                 # If Portuguese input, respond in English and still provide the conversion
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful and friendly Brazilian Portuguese tutor. Help the user by correcting the spelling, syntax and grammar of any Portuguese text in the user input that needs correction. Offer to help going thru topics in grammar, or to transform written Portuguese into highly concise spoken Portuguese. For the last one, use our rules-based code. Always respond in English, even when the user writes in Portuguese."},
+                        {"role": "system", "content": self.portuguese_tutor_prompt},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
                 )
-                
+
                 # Convert the Portuguese text to colloquial form
                 colloquial_text, _ = self.transform_to_colloquial(question)
-                
+
                 return response.choices[0].message.content, True, colloquial_text
             else:
                 # If not Portuguese, just respond normally in English
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful and friendly Brazilian Portuguese tutor. Help the user by correcting the spelling, syntax and grammar of any Portuguese text in the user input that needs correction. Offer to help going thru topics in grammar, or to transform written Portuguese into highly concise spoken Portuguese. For the last one, use our rules-based code. Always respond in English, even when the user writes in Portuguese."},
+                        {"role": "system", "content": self.portuguese_tutor_prompt},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
                 )
-                
+
                 return response.choices[0].message.content, False, None
-                
+
         except Exception as e:
             logger.error(f"Error in ask_question: {str(e)}")
             return f"Error: {str(e)}", False, None
