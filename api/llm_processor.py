@@ -32,6 +32,15 @@ Your teaching approach follows this progression:
 Help the user by correcting spelling, syntax and grammar of any Portuguese text. Offer specific assistance related to the syllabus topics above. Also offer to transform written Portuguese into highly concise spoken Portuguese using our rule-based approach. Always respond in English, even when the user writes in Portuguese.
 
 When teaching pronunciation, emphasize: r/rr sounds, s/z distinctions, lh/nh digraphs, and nasal sounds (ão, em, im).
+
+IMPORTANT: If the user indicates any form of agreement (saying yes, sure, ok, etc.) to start learning, immediately begin teaching the first lesson (Self-Introduction & Stress Rules) with basic phrases, pronunciation guidance, and examples. Don't ask more questions - start teaching right away.
+
+For Lesson 1 (Self-Introduction & Stress Rules):
+- Teach basic greetings: "Olá" (Hello), "Bom dia/tarde/noite" (Good morning/afternoon/night), "Tudo bem?" (How are you?)
+- Show how to introduce oneself: "Eu sou [name]" (I am [name]), "Eu me chamo [name]" (My name is [name])
+- Explain that the stress in Portuguese typically falls on the penultimate syllable
+- Demonstrate the basic sentence structure: Subject + Verb + Complement
+- Provide simple first-person examples: "Eu falo inglês" (I speak English), "Eu moro em [city]" (I live in [city])
 """
 
     def correct_text(self, text):
@@ -109,6 +118,27 @@ When teaching pronunciation, emphasize: r/rr sounds, s/z distinctions, lh/nh dig
             return "Sorry, API key not configured.", False, None
 
         try:
+            # Check if the user is showing agreement to start the syllabus
+            agreement_words = ["yes", "sure", "okay", "ok", "sim", "yes please", "start", "let's start", "begin", 
+                              "let's begin", "i agree", "sounds good", "that's good", "i'm ready", "ready"]
+            
+            user_agreed = question.lower().strip() in agreement_words
+            
+            if user_agreed:
+                # User agreed, start the syllabus with the first lesson
+                syllabus_response = self.client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": self.portuguese_tutor_prompt + "\nWhen the user shows agreement, immediately start teaching the first lesson from the syllabus about Self-Introduction & Stress Rules with examples and clear explanations."},
+                        {"role": "user", "content": "I want to start learning Brazilian Portuguese."},
+                        {"role": "assistant", "content": "Great! Would you like to start with self-introduction and stress rules, or is there something specific you'd like to focus on?"},
+                        {"role": "user", "content": question}
+                    ],
+                    temperature=0.7
+                )
+                
+                return syllabus_response.choices[0].message.content, False, None
+            
             # First determine if the text contains Portuguese
             detect_response = self.client.chat.completions.create(
                 model="gpt-4o",
