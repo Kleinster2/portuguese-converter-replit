@@ -14,6 +14,11 @@ class LLMProcessor:
             self.client = None
         else:
             self.client = OpenAI(api_key=self.api_key)
+        
+        # Track the current lesson and subtopic
+        self.current_lesson = 1
+        self.current_subtopic = "A"  # Start with the first subtopic
+        
         self.portuguese_tutor_prompt = """You are a helpful and friendly Brazilian Portuguese tutor following a structured syllabus. 
 
 Your teaching approach follows this progression:
@@ -35,15 +40,35 @@ When teaching pronunciation, emphasize: r/rr sounds, s/z distinctions, lh/nh dig
 
 IMPORTANT: 
 1. NEVER introduce a topic without explicitly asking the user first and getting confirmation
-2. Present ONE topic at a time, sequentially. Do not present multiple topics at once.
+2. Present ONE small subtopic at a time, sequentially. Never present multiple concepts at once.
 3. Format content professionally - avoid markdown symbols, use proper typography.
 4. For Portuguese phrases, format cleanly as: "Phrase in Portuguese" - English translation
-5. Always ask for confirmation before starting a new lesson or introducing a topic. Do not begin teaching any lesson until the user explicitly confirms they want to learn that specific topic.
+5. Always wait for user confirmation before moving to the next subtopic.
+6. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
 
-For Lesson 1 (Self-Introduction & Stress Rules), once the user has confirmed they want to learn this topic:
-- Start with only teaching basic greetings first: "Olá" (Hello), "Bom dia/tarde/noite" (Good morning/afternoon/night), "Tudo bem?" (How are you?)
-- Then introduce how to introduce oneself: "Eu sou [name]" (I am [name]), "Eu me chamo [name]" (My name is [name])
-- Then explain that the stress in Portuguese typically falls on the penultimate syllable
+For Lesson 1 (Self-Introduction & Stress Rules), break it down into these separate subtopics:
+
+A) Basic greetings ONLY:
+   - "Olá" (Hello)
+   - "Bom dia/tarde/noite" (Good morning/afternoon/night)
+   - "Tudo bem?" (How are you?)
+   * Ask if user wants to proceed to the next subtopic
+
+B) Self-introduction ONLY (after confirmation):
+   - "Eu sou [name]" (I am [name])
+   - "Eu me chamo [name]" (My name is [name])
+   * Ask if user wants to proceed to the next subtopic
+
+C) Stress rules ONLY (after confirmation):
+   - Explain stress on the penultimate syllable
+   - Show examples of regular stress pattern
+   - Explain accent marks as exceptions
+   * Ask if user wants to proceed to the next subtopic
+
+D) Basic sentence structure ONLY (after confirmation):
+   - Subject + Verb + Complement structure
+   - Simple first-person examples
+   * Ask if user wants to proceed to the next subtopic or next lesson
 - Then demonstrate the basic sentence structure: Subject + Verb + Complement
 - Finally provide simple first-person examples: "Eu falo inglês" (I speak English), "Eu moro em [city]" (I live in [city])"""
 
@@ -129,16 +154,16 @@ For Lesson 1 (Self-Introduction & Stress Rules), once the user has confirmed the
             user_agreed = question.lower().strip() in agreement_words
 
             if user_agreed:
-                # User agreed, but always ask for explicit confirmation on the specific topic
+                # User agreed, but always ask for explicit confirmation on a specific subtopic
                 syllabus_response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": self.portuguese_tutor_prompt + "\nAlways ask for explicit confirmation before teaching any lesson. Never start teaching until the user confirms they want to learn that specific topic."},
+                        {"role": "system", "content": self.portuguese_tutor_prompt + "\nTeach only ONE small subtopic at a time. Always ask for explicit confirmation before proceeding to the next subtopic. Never combine multiple concepts in one response."},
                         {"role": "user", "content": "I want to start learning Brazilian Portuguese."},
-                        {"role": "assistant", "content": "Great! Would you like to learn about self-introduction phrases and some basic stress rules in Portuguese? I'll wait for your confirmation before we begin."},
+                        {"role": "assistant", "content": "Great! Let's start with just the basic greetings in Portuguese. Would you like to learn how to say hello and ask how someone is doing? I'll wait for your confirmation before we begin."},
                         {"role": "user", "content": question}
                     ],
-                    temperature=0.7
+                    temperature=0.5
                 )
 
                 return syllabus_response.choices[0].message.content, False, None
