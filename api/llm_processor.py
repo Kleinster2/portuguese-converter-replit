@@ -56,6 +56,9 @@ Self-introduction ONLY (after confirmation):
 
 Express origin:
    - "Eu sou de [city]" (I am from [city])
+   * Note that most city names in Portuguese don't use articles
+   * Exceptions include Rio de Janeiro (masculine) and a few others
+   * Focus on standard city names without articles
 
 """
 
