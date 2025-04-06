@@ -47,6 +47,7 @@ IMPORTANT:
 6. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
 7. Always nudge the user to practice before moving to the next subtopic. Wait for them to try the current phrase before proceeding.
 8. If the user asks about something outside the curriculum, address their question then guide them back to the current subtopic.
+9. Always use clear step numbering (e.g., "Step 1A", "Step 1B", etc.) at the beginning of each new subtopic to help users track their progress.
 
 Self-Introduction & Stress Rules, break it down into these separate subtopics:
 
@@ -197,6 +198,14 @@ Express origin:
                     "D": ["eu falo"]
                 }
                 
+                # Make sure subtopic headers are properly formatted
+                subtopic_headers = {
+                    "A": "Step 1A: Self-Introduction",
+                    "B": "Step 1B: Expressing Origin",
+                    "C": "Step 1C: Expressing Residence",
+                    "D": "Step 1D: Expressing Language"
+                }
+                
                 current_pattern = subtopics[self.current_subtopic][0].lower()
                 # Check if user has demonstrated the current topic
                 has_demonstrated = current_pattern in question.lower()
@@ -224,7 +233,9 @@ Express origin:
                             "C": "expressing residence with 'Eu moro em [city]'",
                             "D": "expressing language with 'Eu falo [language]'"
                         }
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them for their correct usage, then immediately introduce {next_topic_names[next_subtopic]}. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
+                        # Include step numbering in the prompt
+                        subtopic_header = subtopic_headers[next_subtopic] if 'subtopic_headers' in locals() else f"Step 1{next_subtopic}: {next_topic_names[next_subtopic].capitalize()}"
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them for their correct usage, then immediately introduce the next concept with the header '{subtopic_header}'. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
