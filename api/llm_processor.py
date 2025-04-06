@@ -34,12 +34,13 @@ Help the user by correcting spelling, syntax and grammar of any Portuguese text.
 When teaching pronunciation, emphasize: r/rr sounds, s/z distinctions, lh/nh digraphs, and nasal sounds (ão, em, im).
 
 IMPORTANT: 
-1. Present ONE topic at a time, sequentially. Do not present multiple topics at once.
-2. Format content professionally - avoid markdown symbols, use proper typography.
-3. For Portuguese phrases, format cleanly as: "Phrase in Portuguese" - English translation
-4. If the user indicates any form of agreement (saying yes, sure, ok, etc.) to start learning, immediately begin teaching the first lesson (Self-Introduction & Stress Rules) with basic phrases, pronunciation guidance, and examples. Don't ask more questions - start teaching right away.
+1. NEVER introduce a topic without explicitly asking the user first and getting confirmation
+2. Present ONE topic at a time, sequentially. Do not present multiple topics at once.
+3. Format content professionally - avoid markdown symbols, use proper typography.
+4. For Portuguese phrases, format cleanly as: "Phrase in Portuguese" - English translation
+5. Always ask for confirmation before starting a new lesson or introducing a topic. Do not begin teaching any lesson until the user explicitly confirms they want to learn that specific topic.
 
-For Lesson 1 (Self-Introduction & Stress Rules):
+For Lesson 1 (Self-Introduction & Stress Rules), once the user has confirmed they want to learn this topic:
 - Start with only teaching basic greetings first: "Olá" (Hello), "Bom dia/tarde/noite" (Good morning/afternoon/night), "Tudo bem?" (How are you?)
 - Then introduce how to introduce oneself: "Eu sou [name]" (I am [name]), "Eu me chamo [name]" (My name is [name])
 - Then explain that the stress in Portuguese typically falls on the penultimate syllable
@@ -128,13 +129,13 @@ For Lesson 1 (Self-Introduction & Stress Rules):
             user_agreed = question.lower().strip() in agreement_words
 
             if user_agreed:
-                # User agreed, start the syllabus with the first lesson
+                # User agreed, but always ask for explicit confirmation on the specific topic
                 syllabus_response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": self.portuguese_tutor_prompt + "\nWhen the user shows agreement, immediately start teaching the first lesson from the syllabus about Self-Introduction & Stress Rules with examples and clear explanations."},
+                        {"role": "system", "content": self.portuguese_tutor_prompt + "\nAlways ask for explicit confirmation before teaching any lesson. Never start teaching until the user confirms they want to learn that specific topic."},
                         {"role": "user", "content": "I want to start learning Brazilian Portuguese."},
-                        {"role": "assistant", "content": "Great! Would you like to start with self-introduction and stress rules, or is there something specific you'd like to focus on?"},
+                        {"role": "assistant", "content": "Great! Would you like to learn about self-introduction phrases and some basic stress rules in Portuguese? I'll wait for your confirmation before we begin."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
