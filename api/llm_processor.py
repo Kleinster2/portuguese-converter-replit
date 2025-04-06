@@ -47,7 +47,7 @@ class LLMProcessor:
 
     def transform_to_colloquial(self, text):
         """
-        Use LLM to transform formal Portuguese text to colloquial Brazilian Portuguese.
+        Use LLM to transform formal Portuguese text to Brazilian Portuguese concise speech.
 
         Args:
             text (str): The input text to transform
@@ -62,14 +62,14 @@ class LLMProcessor:
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
-                    {"role": "system", "content": "You are an expert in Brazilian Portuguese, transforming formal text into colloquial Brazilian Portuguese. Apply common speech patterns, contractions, and informal expressions without changing the meaning."},
+                    {"role": "system", "content": "You are an expert in Brazilian Portuguese, transforming formal text into concise speech Brazilian Portuguese. Apply common speech patterns, contractions, and informal expressions without changing the meaning."},
                     {"role": "user", "content": text}
                 ],
                 temperature=0.7
             )
 
             transformed_text = response.choices[0].message.content
-            return transformed_text, "Text transformed to colloquial Brazilian Portuguese successfully"
+            return transformed_text, "Text transformed to concise Brazilian Portuguese speech successfully"
 
         except Exception as e:
             logger.error(f"Error in transform_to_colloquial: {str(e)}")
