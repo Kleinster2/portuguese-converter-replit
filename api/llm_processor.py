@@ -156,8 +156,7 @@ Express origin:
                 # Use the current_subtopic to determine what to teach next
                 current_topic = subtopics[self.current_subtopic]
                 
-                # Only move to next subtopic if the user has already practiced the current one
-                # which we determine later in the check for Portuguese response
+                # We will automatically move to next subtopic when the user demonstrates using the current one
                 
                 # Generate response based on current topic
                 syllabus_response = self.client.chat.completions.create(
@@ -199,12 +198,12 @@ Express origin:
                 }
                 
                 current_pattern = subtopics[self.current_subtopic][0].lower()
-                # If user demonstrated the current topic, we can advance next time
+                # Check if user has demonstrated the current topic
                 has_demonstrated = current_pattern in question.lower()
                 next_subtopic = None
                 
                 if has_demonstrated:
-                    # Prepare to advance to next subtopic on next agreement
+                    # Immediately advance to next subtopic when demonstrated
                     if self.current_subtopic == "A":
                         next_subtopic = "B"
                     elif self.current_subtopic == "B":
@@ -225,7 +224,7 @@ Express origin:
                             "C": "expressing residence with 'Eu moro em [city]'",
                             "D": "expressing language with 'Eu falo [language]'"
                         }
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then immediately introduce {next_topic_names[next_subtopic]}. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them for their correct usage, then immediately introduce {next_topic_names[next_subtopic]}. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
