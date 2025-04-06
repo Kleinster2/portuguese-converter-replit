@@ -45,12 +45,14 @@ IMPORTANT:
 4. For Portuguese phrases, format cleanly as: "Phrase in Portuguese" - English translation
 5. Always wait for user confirmation before moving to the next subtopic.
 6. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
+7. DO NOT ask the user if they want to move to a new topic until the user has successfully demonstrated understanding of the current topic through practice. They must first try using the current phrase before you offer to proceed.
 
 Self-Introduction & Stress Rules, break it down into these separate subtopics:
 
 Self-introduction ONLY (after confirmation):
    - "Eu sou [name]" (I am [name])
-   * Ask if user wants to proceed to the next subtopic
+   * Wait for user to practice this phrase with their name
+   * Only after they practice, ask if they want to proceed to the next subtopic
 
 Express origin:
    - "Eu sou de [city]" (I am from [city])
@@ -150,17 +152,8 @@ Express origin:
                 # Use the current_subtopic to determine what to teach next
                 current_topic = subtopics[self.current_subtopic]
                 
-                # Move to the next subtopic for the next time
-                if self.current_subtopic == "A":
-                    next_subtopic = "B"
-                elif self.current_subtopic == "B":
-                    next_subtopic = "C"
-                elif self.current_subtopic == "C":
-                    next_subtopic = "D"
-                else:
-                    next_subtopic = "A"  # Cycle back to beginning if we're at the end
-                
-                self.current_subtopic = next_subtopic
+                # Only move to next subtopic if the user has already practiced the current one
+                # which we determine later in the check for Portuguese response
                 
                 # Generate response based on current topic
                 syllabus_response = self.client.chat.completions.create(
@@ -189,6 +182,28 @@ Express origin:
 
             # Always respond in English
             if is_portuguese:
+                # If Portuguese input, it means the user is practicing
+                # Check if they used the current topic's phrase
+                subtopics = {
+                    "A": ["eu sou"],
+                    "B": ["eu sou de"],
+                    "C": ["eu moro em"],
+                    "D": ["eu falo"]
+                }
+                
+                current_pattern = subtopics[self.current_subtopic][0].lower()
+                # If user demonstrated the current topic, we can advance next time
+                if current_pattern in question.lower():
+                    # Prepare to advance to next subtopic on next agreement
+                    if self.current_subtopic == "A":
+                        self.current_subtopic = "B"
+                    elif self.current_subtopic == "B":
+                        self.current_subtopic = "C"
+                    elif self.current_subtopic == "C":
+                        self.current_subtopic = "D"
+                    else:
+                        self.current_subtopic = "A"  # Cycle back to beginning if we're at the end
+                
                 # If Portuguese input, respond in English and still provide the conversion
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
