@@ -280,13 +280,14 @@ Would like to work on basic self-introductions?
 
 
                 // If Portuguese was detected, add the transformations to the bot response
-                if (responseData.is_portuguese && responseData.colloquial) {
+                if (responseData.is_portuguese && responseData.rule_based) {
                     let fullResponse = responseData.response + "\n\n";
-                    fullResponse += `Colloquial version (LLM): ${responseData.colloquial}`;
+                    fullResponse += `Concise rapid speech: ${responseData.rule_based}`;
                     
-                    if (responseData.rule_based) {
-                        fullResponse += `\n\nColloquial version (Rule-based): ${responseData.rule_based}`;
-                    }
+                    // Commenting out LLM colloquial version for now
+                    // if (responseData.colloquial) {
+                    //     fullResponse += `\n\nColloquial version (LLM): ${responseData.colloquial}`;
+                    // }
                     
                     addMessage(fullResponse, 'bot');
                 } else {
