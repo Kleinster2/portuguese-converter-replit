@@ -108,7 +108,7 @@ class LLMProcessor:
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. Even when users type in Portuguese, you ALWAYS respond in English. If the user provides Portuguese text, respond to them in English and let them know you've provided a colloquial transformation of their text. Be friendly and encouraging."},
+                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. Even when users type in Portuguese, you ALWAYS respond in English. If the user provides Portuguese text, respond to them in English and let them know you've provided a colloquial transformation of their text. NEVER transform English text into Portuguese. Only transform Portuguese to colloquial Brazilian Portuguese. Be friendly and encouraging."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
@@ -123,7 +123,7 @@ class LLMProcessor:
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language transformation. You can chat about any topic in English and respond to questions. Users can ask you to transform formal Portuguese text into colloquial Brazilian Portuguese by using commands like 'transform' or 'convert'. Be friendly and helpful, and occasionally remind users of your transformation capability. Always respond in English."},
+                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language transformation. You can chat about any topic in English and respond to questions. Users can ask you to transform formal Portuguese text into colloquial Brazilian Portuguese by using commands like 'transform' or 'convert'. NEVER transform English text into Portuguese. Only transform Portuguese to colloquial Brazilian Portuguese. Be friendly and helpful, and occasionally remind users of your transformation capability. Always respond in English."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
