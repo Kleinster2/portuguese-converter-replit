@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from portuguese_converter import convert_text
