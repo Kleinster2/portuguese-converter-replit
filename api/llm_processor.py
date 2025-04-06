@@ -198,12 +198,12 @@ Express origin:
                     "D": ["eu falo"]
                 }
                 
-                # Make sure subtopic headers are properly formatted
+                # Make sure subtopic headers are properly formatted without step numbers
                 subtopic_headers = {
-                    "A": "Step 1A: Self-Introduction",
-                    "B": "Step 1B: Expressing Origin",
-                    "C": "Step 1C: Expressing Residence",
-                    "D": "Step 1D: Expressing Language"
+                    "A": "Self-Introduction",
+                    "B": "Expressing Origin",
+                    "C": "Expressing Residence",
+                    "D": "Expressing Language"
                 }
                 
                 current_pattern = subtopics[self.current_subtopic][0].lower()
@@ -233,9 +233,9 @@ Express origin:
                             "C": "expressing residence with 'Eu moro em [city]'",
                             "D": "expressing language with 'Eu falo [language]'"
                         }
-                        # Include step numbering in the prompt
-                        subtopic_header = subtopic_headers[next_subtopic] if 'subtopic_headers' in locals() else f"Step 1{next_subtopic}: {next_topic_names[next_subtopic].capitalize()}"
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them for their correct usage, then immediately introduce the next concept with the header '{subtopic_header}'. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
+                        # Include headers without step numbers
+                        subtopic_header = subtopic_headers[next_subtopic] if 'subtopic_headers' in locals() else f"{next_topic_names[next_subtopic].capitalize()}"
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
