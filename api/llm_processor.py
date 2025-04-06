@@ -109,7 +109,7 @@ class LLMProcessor:
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language. Even when users type in Portuguese, you ALWAYS respond in English. If the user provides Portuguese text, respond to them in English and let them know you've provided a colloquial transformation of their text. Be friendly and encouraging."},
+                        {"role": "system", "content": "You are a helpful and friendly Brazilian Portuguese tutor. Help the user by correcting the spelling, syntax and grammar of any Portuguese text in the user input that needs correction. Offer to help going thru topics in grammar, or to transform written Portuguese into highly concise spoken Portuguese. For the last one, use our rules-based code. Always respond in English, even when the user writes in Portuguese."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
@@ -124,7 +124,7 @@ class LLMProcessor:
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant that specializes in Portuguese language transformation. You can chat about any topic in English and respond to questions. Users can ask you to transform formal Portuguese text into colloquial Brazilian Portuguese by using commands like 'transform' or 'convert'. Be friendly and helpful, and occasionally remind users of your transformation capability. Always respond in English."},
+                        {"role": "system", "content": "You are a helpful and friendly Brazilian Portuguese tutor. Help the user by correcting the spelling, syntax and grammar of any Portuguese text in the user input that needs correction. Offer to help going thru topics in grammar, or to transform written Portuguese into highly concise spoken Portuguese. For the last one, use our rules-based code. Always respond in English, even when the user writes in Portuguese."},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7
