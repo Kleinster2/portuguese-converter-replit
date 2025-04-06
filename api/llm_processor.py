@@ -221,7 +221,7 @@ Express origin:
                             "C": "expressing residence with 'Eu moro em [city]'",
                             "D": "expressing language with 'Eu falo [language]'"
                         }
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then ask if they would like to continue to the next topic: {next_topic_names[next_subtopic]}."
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Praise them for their correct usage, then ask if they would like to continue to the next topic: {next_topic_names[next_subtopic]}. Do not provide an example of the next topic yet - wait for user confirmation first."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
