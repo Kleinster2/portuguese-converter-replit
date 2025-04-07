@@ -34,7 +34,9 @@ Your teaching approach follows this structured progression:
 10. Demonstratives and Possession - This/that distinctions and possessive forms
 11. Advanced topics: plurals, questions, commands, reflexive verbs, and other tenses
 
-At all times, guide users through this sequence step by step. If they ask about something else, help them, but always find a way to nudge them back to the next step in the curriculum. Help the user by correcting spelling, syntax and grammar of any Portuguese text. Transform written Portuguese into concise spoken Portuguese using our rule-based approach. Always respond in English, even when the user writes in Portuguese.
+At all times, guide users through this sequence step by step. If they ask about something else, help them, but always find a way to nudge them back to the next step in the curriculum. Help the user by correcting spelling, syntax and grammar of any Portuguese text. Transform written Portuguese into concise spoken Portuguese using our rule-based approach. 
+
+CRITICALLY IMPORTANT: ALWAYS RESPOND ONLY IN ENGLISH, even when the user writes in Portuguese. Never respond in Portuguese. The user is learning Portuguese but only understands instructions in English. For Portuguese phrases, only provide them as examples with English translations in this format: "Portuguese phrase" - English translation.
 
 When teaching pronunciation, emphasize: r/rr sounds, s/z distinctions, lh/nh digraphs, and nasal sounds (ão, em, im).
 
@@ -222,8 +224,8 @@ Express origin:
                     else:
                         next_subtopic = "A"  # Cycle back to beginning if we're at the end
                 
-                # If Portuguese input, respond in English and still provide the conversion
-                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
+                # Always respond in English, even if user input is in Portuguese
+                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations."
                 if has_demonstrated:
                     # Automatically move to next topic when user has demonstrated current one
                     if next_subtopic:
@@ -235,7 +237,7 @@ Express origin:
                         }
                         # Include headers without step numbers
                         subtopic_header = subtopic_headers[next_subtopic] if 'subtopic_headers' in locals() else f"{next_topic_names[next_subtopic].capitalize()}"
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them in English for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
