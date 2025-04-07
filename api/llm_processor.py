@@ -47,12 +47,13 @@ IMPORTANT:
 2. Present ONE small subtopic at a time, sequentially. Never present multiple concepts at once.
 3. Format content professionally - avoid markdown symbols, use proper typography.
 4. For Portuguese phrases, format cleanly as: "Phrase in Portuguese" - English translation
-5. After user demonstrates understanding of the current topic, immediately guide them to the next subtopic
-6. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
-7. Do NOT use terms like "try saying" or "practice" - this is a text-based tutor.
-8. If the user asks about something outside the curriculum, address their question then guide them back to the current subtopic.
-9. DO NOT use step numbering (e.g., "Step 1A", "Step 1B") in your responses to the user. The step numbers are for internal curriculum tracking only and should never be communicated to the user.
-10. Present a complete introduction from the beginning - introduce name, origin, etc. as a complete sequence rather than isolating name only.
+5. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
+6. Do NOT use terms like "try saying" or "practice" - this is a text-based tutor.
+7. If the user asks about something outside the curriculum, address their question then guide them back to the current subtopic.
+8. DO NOT use step numbering (e.g., "Step 1A", "Step 1B") in your responses to the user. The step numbers are for internal curriculum tracking only and should never be communicated to the user.
+9. Present a complete introduction from the beginning - introduce name, origin, etc. as a complete sequence rather than isolating name only.
+10. If a user makes a mistake in their Portuguese response, point out the mistake specifically and ask them to try again. Do not move on to the next concept until they get the current one right.
+11. Always repeat back what the user has already learned correctly. Even in later steps, remind the user of what they've mastered in previous steps by including their correct responses. For example: "Great! You've learned 'Eu sou [name]' and 'Eu sou de [city]', now let's learn..."
 
 Self-Introduction & Stress Rules, break it down into these subtopics to be taught in sequence:
 
@@ -237,12 +238,28 @@ Self-introduction basics:
                 }
 
                 current_pattern = subtopics[self.current_subtopic][0].lower()
-                # Check if user has demonstrated the current topic
+                # Check if user has demonstrated the current topic correctly
                 has_demonstrated = current_pattern in question.lower()
+                is_correct = has_demonstrated
+                
+                # More specific validation for each subtopic
+                if self.current_subtopic == "A" and has_demonstrated:
+                    # Simple presence check for "Eu sou [something]" is sufficient
+                    is_correct = True
+                elif self.current_subtopic == "B" and has_demonstrated:
+                    # Check if "Eu sou de [city]" is properly formed
+                    is_correct = "eu sou de" in question.lower() and len(question.split()) >= 4
+                elif self.current_subtopic == "C" and has_demonstrated:
+                    # Check if "Eu moro em [city]" is properly formed
+                    is_correct = "eu moro em" in question.lower() and len(question.split()) >= 4
+                elif self.current_subtopic == "D" and has_demonstrated:
+                    # Check if "Eu falo [language]" is properly formed
+                    is_correct = "eu falo" in question.lower() and len(question.split()) >= 3
+                
                 next_subtopic = None
 
-                if has_demonstrated:
-                    # Immediately advance to next subtopic when demonstrated
+                if is_correct:
+                    # Only advance to next subtopic when demonstrated correctly
                     if self.current_subtopic == "A":
                         next_subtopic = "B"
                     elif self.current_subtopic == "B":
@@ -252,24 +269,39 @@ Self-introduction basics:
                     else:
                         next_subtopic = "A"  # Cycle back to beginning if we're at the end
 
+                # Track what the user has learned correctly
+                learned_phrases = []
+                if self.current_subtopic >= "B":
+                    learned_phrases.append("Eu sou [name]")
+                if self.current_subtopic >= "C":
+                    learned_phrases.append("Eu sou de [city]")
+                if self.current_subtopic >= "D":
+                    learned_phrases.append("Eu moro em [city]")
+                
+                # Prepare phrases already learned for inclusion in the prompt
+                learned_phrases_text = ""
+                if learned_phrases:
+                    learned_phrases_text = "The user has correctly learned: " + ", ".join(learned_phrases) + ". Always remind them of these accomplishments before teaching new material."
+                
                 # Always respond in English, even if user input is in Portuguese
-                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
-                if has_demonstrated:
-                    # Automatically move to next topic when user has demonstrated current one
-                    if next_subtopic:
-                        next_topic_names = {
-                            "A": "self-introduction with 'Eu sou [name]'",
-                            "B": "expressing origin with 'Eu sou de [city]'",
-                            "C":
-                            "expressing residence with 'Eu moro em [city]'",
-                            "D":
-                            "expressing language with 'Eu falo [language]'"
-                        }
-                        # Include headers without step numbers
-                        subtopic_header = subtopic_headers[
-                            next_subtopic] if 'subtopic_headers' in locals(
-                            ) else f"{next_topic_names[next_subtopic].capitalize()}"
-                        system_prompt += "\n\nThe user has demonstrated understanding of the current topic. Briefly praise them in English for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence. DO NOT mention any step numbers or step identifiers in your response."
+                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
+                
+                if is_correct and next_subtopic:
+                    # When user demonstrates correct understanding, move to next topic
+                    next_topic_names = {
+                        "A": "self-introduction with 'Eu sou [name]'",
+                        "B": "expressing origin with 'Eu sou de [city]'",
+                        "C": "expressing residence with 'Eu moro em [city]'",
+                        "D": "expressing language with 'Eu falo [language]'"
+                    }
+                    # Include headers without step numbers
+                    subtopic_header = subtopic_headers[
+                        next_subtopic] if 'subtopic_headers' in locals(
+                        ) else f"{next_topic_names[next_subtopic].capitalize()}"
+                    system_prompt += "\n\nThe user has demonstrated correct understanding of the current topic. Praise them in English for their correct usage, then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept. DO NOT mention any step numbers or step identifiers in your response."
+                elif has_demonstrated and not is_correct:
+                    # User attempted but made a mistake
+                    system_prompt += "\n\nThe user has attempted the current topic but made a mistake. Point out the specific error in their Portuguese response and ask them to try again. Provide the correct pattern again as a reminder. Do NOT move on to the next topic until they get this right."
 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
@@ -282,8 +314,8 @@ Self-introduction basics:
                     }],
                     temperature=0.7)
 
-                # Only update the current subtopic after generating the response
-                if has_demonstrated and next_subtopic:
+                # Only update the current subtopic after generating the response if correct
+                if is_correct and next_subtopic:
                     self.current_subtopic = next_subtopic
 
                 # Convert the Portuguese text to colloquial form
