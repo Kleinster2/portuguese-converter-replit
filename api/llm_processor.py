@@ -21,7 +21,7 @@ class LLMProcessor:
         self.current_lesson = 1
         self.current_subtopic = "A"  # Start with the first subtopic
 
-        self.portuguese_tutor_prompt = """You are a helpful and friendly Brazilian Portuguese tutor following a structured syllabus. 
+        self.portuguese_tutor_prompt = """You are a helpful and friendly Portuguese tutor following a structured syllabus. 
 
 Your teaching approach follows this structured progression:
 1. Self-Introduction & Stress Rules - Focusing on basic sentence structure (Subject+Verb+Complement) and first-person singular (eu)
@@ -48,12 +48,14 @@ IMPORTANT:
 3. Format content professionally - avoid markdown symbols, use proper typography.
 4. For Portuguese phrases, format cleanly as: "Phrase in Portuguese" - English translation
 5. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
-6. Do NOT use terms like "try saying" or "practice" - this is a text-based tutor.
+6. DO NOT use terms like "try saying" or "practice" - this is a text-based tutor.
 7. If the user asks about something outside the curriculum, address their question then guide them back to the current subtopic.
 8. DO NOT use step numbering (e.g., "Step 1A", "Step 1B") in your responses to the user. The step numbers are for internal curriculum tracking only and should never be communicated to the user.
 9. Present a complete introduction from the beginning - introduce name, origin, etc. as a complete sequence rather than isolating name only.
 10. If a user makes a mistake in their Portuguese response, point out the mistake specifically and ask them to try again. Do not move on to the next concept until they get the current one right.
-11. Always repeat back what the user has already learned correctly. Even in later steps, remind the user of what they've mastered in previous steps by including their correct responses. For example: "Great! You've learned 'Eu sou [name]' and 'Eu sou de [city]', now let's learn..."
+11. Always repeat back what the user has already learned correctly. Even in later steps, remind the user of what they've mastered in previous steps by including their correct responses in a matter-of-fact way. For example: "You've used 'Eu sou [name]' and 'Eu sou de [city]' correctly. Now let's learn..."
+12. Use non-Brazilian/Portuguese cities in examples (like New York, London, Paris, Tokyo, etc.) as learners are likely not from Portuguese-speaking locations.
+13. Use a direct, adult tone in responses - avoid overly enthusiastic praise or infantilizing language. Treat the user as an adult learner.
 
 Self-Introduction & Stress Rules, break it down into these subtopics to be taught in sequence:
 
@@ -62,7 +64,7 @@ Self-introduction basics:
    - "Eu sou de [city]" (I am from [city])
    - "Eu moro em [city]" (I live in [city])
    - "Eu falo [language]" (I speak [language])
-   
+
    * Present these as a natural progression of introducing oneself
    * For city names, note that most don't use articles in Portuguese
    * Exceptions include Rio de Janeiro (masculine) and a few others
@@ -241,7 +243,7 @@ Self-introduction basics:
                 # Check if user has demonstrated the current topic correctly
                 has_demonstrated = current_pattern in question.lower()
                 is_correct = has_demonstrated
-                
+
                 # More specific validation for each subtopic
                 if self.current_subtopic == "A" and has_demonstrated:
                     # Simple presence check for "Eu sou [something]" is sufficient
@@ -255,7 +257,7 @@ Self-introduction basics:
                 elif self.current_subtopic == "D" and has_demonstrated:
                     # Check if "Eu falo [language]" is properly formed
                     is_correct = "eu falo" in question.lower() and len(question.split()) >= 3
-                
+
                 next_subtopic = None
 
                 if is_correct:
@@ -277,15 +279,15 @@ Self-introduction basics:
                     learned_phrases.append("Eu sou de [city]")
                 if self.current_subtopic >= "D":
                     learned_phrases.append("Eu moro em [city]")
-                
+
                 # Prepare phrases already learned for inclusion in the prompt
                 learned_phrases_text = ""
                 if learned_phrases:
                     learned_phrases_text = "The user has correctly learned: " + ", ".join(learned_phrases) + ". Always remind them of these accomplishments before teaching new material."
-                
+
                 # Always respond in English, even if user input is in Portuguese
                 system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
-                
+
                 if is_correct and next_subtopic:
                     # When user demonstrates correct understanding, move to next topic
                     next_topic_names = {
@@ -298,7 +300,7 @@ Self-introduction basics:
                     subtopic_header = subtopic_headers[
                         next_subtopic] if 'subtopic_headers' in locals(
                         ) else f"{next_topic_names[next_subtopic].capitalize()}"
-                    system_prompt += "\n\nThe user has demonstrated correct understanding of the current topic. Praise them in English for their correct usage, then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept. DO NOT mention any step numbers or step identifiers in your response."
+                    system_prompt += "\n\nThe user has demonstrated correct understanding of the current topic.  Then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept. DO NOT mention any step numbers or step identifiers in your response."
                 elif has_demonstrated and not is_correct:
                     # User attempted but made a mistake
                     system_prompt += "\n\nThe user has attempted the current topic but made a mistake. Point out the specific error in their Portuguese response and ask them to try again. Provide the correct pattern again as a reminder. Do NOT move on to the next topic until they get this right."
