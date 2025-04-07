@@ -49,7 +49,7 @@ IMPORTANT:
 6. Follow the syllabus strictly, breaking each lesson into the smallest possible teachable units.
 7. Always nudge the user to practice before moving to the next subtopic. Wait for them to try the current phrase before proceeding.
 8. If the user asks about something outside the curriculum, address their question then guide them back to the current subtopic.
-9. Always use clear step numbering (e.g., "Step 1A", "Step 1B", etc.) at the beginning of each new subtopic to help users track their progress.
+9. DO NOT use step numbering (e.g., "Step 1A", "Step 1B") in your responses to the user. The step numbers are for internal curriculum tracking only and should never be communicated to the user.
 
 Self-Introduction & Stress Rules, break it down into these separate subtopics:
 
@@ -225,7 +225,7 @@ Express origin:
                         next_subtopic = "A"  # Cycle back to beginning if we're at the end
                 
                 # Always respond in English, even if user input is in Portuguese
-                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations."
+                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
                 if has_demonstrated:
                     # Automatically move to next topic when user has demonstrated current one
                     if next_subtopic:
@@ -237,7 +237,7 @@ Express origin:
                         }
                         # Include headers without step numbers
                         subtopic_header = subtopic_headers[next_subtopic] if 'subtopic_headers' in locals() else f"{next_topic_names[next_subtopic].capitalize()}"
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them in English for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence."
+                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them in English for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence. DO NOT mention any step numbers or step identifiers in your response."
                 
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
