@@ -5,7 +5,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class LLMProcessor:
+
     def __init__(self):
         load_dotenv()
         self.api_key = os.getenv('OPENAI_API_KEY')
@@ -14,11 +16,11 @@ class LLMProcessor:
             self.client = None
         else:
             self.client = OpenAI(api_key=self.api_key)
-        
+
         # Track the current lesson and subtopic
         self.current_lesson = 1
         self.current_subtopic = "A"  # Start with the first subtopic
-        
+
         self.portuguese_tutor_prompt = """You are a helpful and friendly Brazilian Portuguese tutor following a structured syllabus. 
 
 Your teaching approach follows this structured progression:
@@ -60,7 +62,6 @@ Self-introduction ONLY (after confirmation):
 
 Express origin:
    - "Eu sou de [city]" (I am from [city])
-   * Note that most city names in Portuguese don't use articles
    * Exceptions include Rio de Janeiro (masculine) and a few others
    * Focus on standard city names without articles
 
@@ -82,12 +83,16 @@ Express origin:
         try:
             response = self.client.chat.completions.create(
                 model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that corrects typos, syntax, and grammar issues in Portuguese text. Keep the overall meaning intact. Return only the corrected text without explanations."},
-                    {"role": "user", "content": text}
-                ],
-                temperature=0.2
-            )
+                messages=[{
+                    "role":
+                    "system",
+                    "content":
+                    "You are a helpful assistant that corrects typos, syntax, and grammar issues in Portuguese text. Keep the overall meaning intact. Return only the corrected text without explanations."
+                }, {
+                    "role": "user",
+                    "content": text
+                }],
+                temperature=0.2)
 
             corrected_text = response.choices[0].message.content
             return corrected_text, "Text corrected successfully"
@@ -112,12 +117,16 @@ Express origin:
         try:
             response = self.client.chat.completions.create(
                 model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": "You are an expert in Brazilian Portuguese, transforming formal text into concise speech Brazilian Portuguese. Apply common speech patterns, contractions, and informal expressions without changing the meaning."},
-                    {"role": "user", "content": text}
-                ],
-                temperature=0.7
-            )
+                messages=[{
+                    "role":
+                    "system",
+                    "content":
+                    "You are an expert in Brazilian Portuguese, transforming formal text into concise speech Brazilian Portuguese. Apply common speech patterns, contractions, and informal expressions without changing the meaning."
+                }, {
+                    "role": "user",
+                    "content": text
+                }],
+                temperature=0.7)
 
             transformed_text = response.choices[0].message.content
             return transformed_text, "Text transformed to concise Brazilian Portuguese speech successfully"
@@ -142,11 +151,14 @@ Express origin:
 
         try:
             # Check if the user is showing agreement to start the syllabus or progress to next topic
-            agreement_words = ["yes", "sure", "okay", "ok", "sim", "yes please", "start", "let's start", "begin", 
-                              "let's begin", "i agree", "sounds good", "that's good", "i'm ready", "ready"]
+            agreement_words = [
+                "yes", "sure", "okay", "ok", "sim", "yes please", "start",
+                "let's start", "begin", "let's begin", "i agree",
+                "sounds good", "that's good", "i'm ready", "ready"
+            ]
 
             user_agreed = question.lower().strip() in agreement_words
-            
+
             if user_agreed:
                 # Track progress through the syllabus
                 subtopics = {
@@ -155,37 +167,52 @@ Express origin:
                     "C": "expressing residence with 'Eu moro em [city]'",
                     "D": "expressing language with 'Eu falo [language]'"
                 }
-                
+
                 # Use the current_subtopic to determine what to teach next
                 current_topic = subtopics[self.current_subtopic]
-                
+
                 # We will automatically move to next subtopic when the user demonstrates using the current one
-                
+
                 # Generate response based on current topic
                 syllabus_response = self.client.chat.completions.create(
                     model="gpt-4o",
-                    messages=[
-                        {"role": "system", "content": self.portuguese_tutor_prompt + f"\nTeach specifically about {current_topic} now. Do not repeat previous topics. Move forward in the syllabus."},
-                        {"role": "user", "content": f"I want to learn about {current_topic} in Brazilian Portuguese."},
-                        {"role": "user", "content": question}
-                    ],
-                    temperature=0.5
-                )
+                    messages=[{
+                        "role":
+                        "system",
+                        "content":
+                        self.portuguese_tutor_prompt +
+                        f"\nTeach specifically about {current_topic} now. Do not repeat previous topics. Move forward in the syllabus."
+                    }, {
+                        "role":
+                        "user",
+                        "content":
+                        f"I want to learn about {current_topic} in Brazilian Portuguese."
+                    }, {
+                        "role": "user",
+                        "content": question
+                    }],
+                    temperature=0.5)
 
-                return syllabus_response.choices[0].message.content, False, None
+                return syllabus_response.choices[
+                    0].message.content, False, None
 
             # First determine if the text contains Portuguese
             detect_response = self.client.chat.completions.create(
                 model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": "You are a language detection assistant. Your only job is to determine if text contains Portuguese. Respond with 'YES' if the text is in Portuguese (even partially), and 'NO' if it's not."},
-                    {"role": "user", "content": question}
-                ],
-                temperature=0.1
-            )
+                messages=[{
+                    "role":
+                    "system",
+                    "content":
+                    "You are a language detection assistant. Your only job is to determine if text contains Portuguese. Respond with 'YES' if the text is in Portuguese (even partially), and 'NO' if it's not."
+                }, {
+                    "role": "user",
+                    "content": question
+                }],
+                temperature=0.1)
 
-            is_portuguese = "YES" in detect_response.choices[0].message.content.upper()
-            
+            is_portuguese = "YES" in detect_response.choices[
+                0].message.content.upper()
+
             # Additional instruction to focus strictly on the curriculum sequence
             sequence_instruction = "IMPORTANT: Never invite the user to divert from the established learning sequence. Always stay focused on offering the next step in the syllabus process. Only move forward once the user demonstrates understanding of the current topic."
 
@@ -199,7 +226,7 @@ Express origin:
                     "C": ["eu moro em"],
                     "D": ["eu falo"]
                 }
-                
+
                 # Make sure subtopic headers are properly formatted without step numbers
                 subtopic_headers = {
                     "A": "Self-Introduction",
@@ -207,12 +234,12 @@ Express origin:
                     "C": "Expressing Residence",
                     "D": "Expressing Language"
                 }
-                
+
                 current_pattern = subtopics[self.current_subtopic][0].lower()
                 # Check if user has demonstrated the current topic
                 has_demonstrated = current_pattern in question.lower()
                 next_subtopic = None
-                
+
                 if has_demonstrated:
                     # Immediately advance to next subtopic when demonstrated
                     if self.current_subtopic == "A":
@@ -223,7 +250,7 @@ Express origin:
                         next_subtopic = "D"
                     else:
                         next_subtopic = "A"  # Cycle back to beginning if we're at the end
-                
+
                 # Always respond in English, even if user input is in Portuguese
                 system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
                 if has_demonstrated:
@@ -232,22 +259,28 @@ Express origin:
                         next_topic_names = {
                             "A": "self-introduction with 'Eu sou [name]'",
                             "B": "expressing origin with 'Eu sou de [city]'",
-                            "C": "expressing residence with 'Eu moro em [city]'",
-                            "D": "expressing language with 'Eu falo [language]'"
+                            "C":
+                            "expressing residence with 'Eu moro em [city]'",
+                            "D":
+                            "expressing language with 'Eu falo [language]'"
                         }
                         # Include headers without step numbers
-                        subtopic_header = subtopic_headers[next_subtopic] if 'subtopic_headers' in locals() else f"{next_topic_names[next_subtopic].capitalize()}"
-                        system_prompt += f"\n\nThe user has demonstrated understanding of the current topic. Briefly praise them in English for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence. DO NOT mention any step numbers or step identifiers in your response."
-                
+                        subtopic_header = subtopic_headers[
+                            next_subtopic] if 'subtopic_headers' in locals(
+                            ) else f"{next_topic_names[next_subtopic].capitalize()}"
+                        system_prompt += "\n\nThe user has demonstrated understanding of the current topic. Briefly praise them in English for their correct usage, then immediately introduce the next concept. Provide a clear example of the next phrase pattern. Do not ask for permission to proceed - move directly to teaching the next concept. Do not suggest alternate topics or allow diverting from the sequence. DO NOT mention any step numbers or step identifiers in your response."
+
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": question}
-                    ],
-                    temperature=0.7
-                )
-                
+                    messages=[{
+                        "role": "system",
+                        "content": system_prompt
+                    }, {
+                        "role": "user",
+                        "content": question
+                    }],
+                    temperature=0.7)
+
                 # Only update the current subtopic after generating the response
                 if has_demonstrated and next_subtopic:
                     self.current_subtopic = next_subtopic
@@ -255,17 +288,23 @@ Express origin:
                 # Convert the Portuguese text to colloquial form
                 colloquial_text, _ = self.transform_to_colloquial(question)
 
-                return response.choices[0].message.content, True, colloquial_text
+                return response.choices[
+                    0].message.content, True, colloquial_text
             else:
                 # If not Portuguese, just respond normally in English
                 response = self.client.chat.completions.create(
                     model="gpt-4o",
-                    messages=[
-                        {"role": "system", "content": self.portuguese_tutor_prompt + "\n\n" + sequence_instruction},
-                        {"role": "user", "content": question}
-                    ],
-                    temperature=0.7
-                )
+                    messages=[{
+                        "role":
+                        "system",
+                        "content":
+                        self.portuguese_tutor_prompt + "\n\n" +
+                        sequence_instruction
+                    }, {
+                        "role": "user",
+                        "content": question
+                    }],
+                    temperature=0.7)
 
                 return response.choices[0].message.content, False, None
 
