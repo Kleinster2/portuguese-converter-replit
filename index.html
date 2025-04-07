@@ -278,8 +278,10 @@ Let's start with the basic introduction phrase in Portuguese:
 
                 // If Portuguese was detected, add the transformations to the bot response
                 if (responseData.is_portuguese && responseData.rule_based) {
-                    let fullResponse = responseData.response + "\n\n";
-                    fullResponse += `Concise rapid speech: ${responseData.rule_based}`;
+                    let fullResponse = responseData.response;
+                    // Commenting out Concise rapid speech for now
+                    // fullResponse += "\n\n";
+                    // fullResponse += `Concise rapid speech: ${responseData.rule_based}`;
 
                     // Commenting out LLM colloquial version for now
                     // if (responseData.colloquial) {
