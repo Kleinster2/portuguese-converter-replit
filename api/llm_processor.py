@@ -76,7 +76,7 @@ Prepositions and Contractions (Lesson 2):
    - "para" (for/to)
    - "com" (with)
    - Common contractions: no/na (em + o/a), do/da (de + o/a), ao/à (a + o/a)
-   
+
    * Teach these prepositions with practical examples
    * Focus on usage in everyday conversation
    * Show how contractions form and when they're used
@@ -154,21 +154,21 @@ Prepositions and Contractions (Lesson 2):
     def extract_portuguese_words(self, text):
         """
         Extract Portuguese words from text and generate a glossary with meanings.
-        
+
         Args:
             text (str): Text that may contain Portuguese words
-            
+
         Returns:
             list: A list of dictionaries containing word and meaning
         """
         if not self.client:
             return []
-            
+
         try:
             # Skip processing for very short texts or texts that are likely not Portuguese
             if len(text.split()) <= 2 or "?" in text:
                 return []
-                
+
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[{
@@ -181,18 +181,18 @@ Prepositions and Contractions (Lesson 2):
                 temperature=0.3,
                 response_format={"type": "json_object"}
             )
-            
+
             try:
                 import json
                 result = json.loads(response.choices[0].message.content)
                 return result.get("words", [])
             except:
                 return []
-                
+
         except Exception as e:
             logger.error(f"Error in extract_portuguese_words: {str(e)}")
             return []
-    
+
     def ask_question(self, question):
         """
         Interactive chat with LLM that detects Portuguese text and converts it if needed,
@@ -312,6 +312,29 @@ Prepositions and Contractions (Lesson 2):
                     # Check if "Eu falo [language]" is properly formed
                     is_correct = "eu falo" in question.lower() and len(question.split()) >= 3
 
+                    # Check for common English language names that should be in Portuguese
+                    english_languages = ["english", "japanese", "spanish", "french", "german", "italian", "chinese"]
+                    portuguese_languages = ["inglês", "japonês", "espanhol", "francês", "alemão", "italiano", "chinês"]
+
+                    # If the user used an English language name, we'll consider it a teaching moment
+                    # but not mark it as correct to prompt the proper correction
+                    for lang in english_languages:
+                        if lang.lower() in question.lower():
+                            is_correct = False
+                            break
+
+                    # If moving to next lesson (Lesson 2 on prepositions)
+                    if is_correct:
+                        # Preposition examples for Lesson 2 focusing on 'de'
+                        preposition_examples = [
+                            "Eu sou de Nova York (I am from New York) - origin",
+                            "O livro de Maria (Maria's book) - possession",
+                            "Uma xícara de café (A cup of coffee) - content",
+                            "Uma mesa de madeira (A wooden table) - material",
+                            "Ela falou de você (She talked about you) - topic"
+                        ]
+                        system_prompt += "\n\nWhen introducing the preposition 'de', provide these varied examples to show its versatility: " + "; ".join(preposition_examples)
+
                 next_subtopic = None
 
                 if is_correct:
@@ -380,13 +403,13 @@ Prepositions and Contractions (Lesson 2):
 
                 # Convert the Portuguese text to colloquial form
                 colloquial_text, _ = self.transform_to_colloquial(question)
-                
+
                 # Generate glossary for response text
                 glossary = self.extract_portuguese_words(response.choices[0].message.content)
-                
+
                 # Also add words from user input that may not be in the response
                 user_glossary = self.extract_portuguese_words(question)
-                
+
                 # Combine glossaries without duplicates
                 all_words = {item['word']: item for item in glossary + user_glossary}
                 combined_glossary = list(all_words.values())
@@ -407,7 +430,7 @@ Prepositions and Contractions (Lesson 2):
                         "content": question
                     }],
                     temperature=0.7)
-                
+
                 # Generate glossary for any Portuguese words in the response
                 glossary = self.extract_portuguese_words(response.choices[0].message.content)
 
