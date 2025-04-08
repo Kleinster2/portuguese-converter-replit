@@ -235,7 +235,14 @@ Eu sou [name] = I am [name]
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}-message`;
-            messageDiv.textContent = text;
+            
+            // Check if text contains HTML for glossary
+            if (sender === 'bot' && text.includes('<div class="glossary-section">')) {
+                messageDiv.innerHTML = text;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
