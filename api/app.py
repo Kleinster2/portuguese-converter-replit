@@ -248,11 +248,12 @@ def ask_llm():
         user_text = data['text']
 
         # Process the user's text with the LLM
-        response, is_portuguese, colloquial_version = llm_processor.ask_question(user_text)
+        response, is_portuguese, colloquial_version, glossary = llm_processor.ask_question(user_text)
 
         result = {
             'response': response,
-            'is_portuguese': is_portuguese
+            'is_portuguese': is_portuguese,
+            'glossary': glossary
         }
 
         # Include colloquial version if Portuguese was detected
