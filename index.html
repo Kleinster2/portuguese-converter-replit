@@ -321,12 +321,15 @@ Eu sou [name] = I am [name]
                     if (responseData.glossary && responseData.glossary.length > 0) {
                         // If we have glossary items, use the HTML version
                         let fullResponse = responseData.response.replace(/\n/g, '<br>');
-                        fullResponse += `<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
 
-                        responseData.glossary.forEach(item => {
-                            fullResponse += `<div class="glossary-item"><span class="portuguese-word">${item.word}</span> - ${item.meaning}</div>`;
-                        });
-                        fullResponse += `</div>`;
+                        if (responseData.glossary && responseData.glossary.length > 0) {
+                            fullResponse += `<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
+
+                            responseData.glossary.forEach(item => {
+                                fullResponse += `<div class="glossary-item"><span class="portuguese-word">${item.word}</span> - ${item.meaning}</div>`;
+                            });
+                            fullResponse += `</div>`;
+                        }
 
                         addMessage(fullResponse, 'bot');
                     } else {

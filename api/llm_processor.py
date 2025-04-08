@@ -173,7 +173,21 @@ Prepositions and Contractions (Lesson 2):
                 model="gpt-4o",
                 messages=[{
                     "role": "system",
-                    "content": "You are a Portuguese language assistant. Extract all Portuguese words from the given text and provide their English meanings. Format your response as a JSON array of objects with 'word' and 'meaning' keys. Only include actual Portuguese words, ignore English words or punctuation. If there are no Portuguese words, return an empty array."
+                    "content": """You are a Portuguese language assistant. Extract all Portuguese words and phrases from the given text and provide their English meanings.
+
+Format your response as a JSON object with a single key 'words' containing an array of objects with 'word' and 'meaning' keys.
+
+Example format:
+{
+  "words": [
+    {"word": "Eu sou", "meaning": "I am"},
+    {"word": "obrigado", "meaning": "thank you"}
+  ]
+}
+
+Only include actual Portuguese words and common phrases, ignore English words or punctuation. Focus on words that would be helpful for a language learner. Look specifically for Portuguese words that appear in quotation marks with English translations.
+If there are no Portuguese words, return {"words": []}.
+"""
                 }, {
                     "role": "user",
                     "content": text
@@ -186,7 +200,8 @@ Prepositions and Contractions (Lesson 2):
                 import json
                 result = json.loads(response.choices[0].message.content)
                 return result.get("words", [])
-            except:
+            except Exception as e:
+                logger.error(f"Error parsing glossary JSON: {str(e)}")
                 return []
 
         except Exception as e:

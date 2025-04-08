@@ -250,6 +250,11 @@ def ask_llm():
         # Process the user's text with the LLM
         response, is_portuguese, colloquial_version, glossary = llm_processor.ask_question(user_text)
 
+        # If no glossary was returned but there are Portuguese phrases in the response,
+        # try to extract them directly
+        if not glossary and '"' in response and not is_portuguese:
+            glossary = llm_processor.extract_portuguese_words(response)
+            
         result = {
             'response': response,
             'is_portuguese': is_portuguese,
