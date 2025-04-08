@@ -235,14 +235,14 @@ Eu sou [name] = I am [name]
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}-message`;
-            
+
             // Check if text contains HTML for glossary
             if (sender === 'bot' && text.includes('<div class="glossary-section">')) {
                 messageDiv.innerHTML = text;
             } else {
                 messageDiv.textContent = text;
             }
-            
+
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -320,24 +320,15 @@ Eu sou [name] = I am [name]
                     // For regular responses without Portuguese detection
                     if (responseData.glossary && responseData.glossary.length > 0) {
                         // If we have glossary items, use the HTML version
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = `message bot-message`;
-
-                        // Convert newlines to <br> tags in the response text
-                        let formattedResponse = responseData.response.replace(/\n/g, '<br>');
-                        
-                        // Add a clear separation between response and glossary
-                        let fullResponse = formattedResponse;
+                        let fullResponse = responseData.response.replace(/\n/g, '<br>');
                         fullResponse += `<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
-                        
+
                         responseData.glossary.forEach(item => {
                             fullResponse += `<div class="glossary-item"><span class="portuguese-word">${item.word}</span> - ${item.meaning}</div>`;
                         });
                         fullResponse += `</div>`;
 
-                        messageDiv.innerHTML = fullResponse;
-                        chatMessages.appendChild(messageDiv);
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        addMessage(fullResponse, 'bot');
                     } else {
                         // Just regular response without glossary
                         addMessage(responseData.response, 'bot');
