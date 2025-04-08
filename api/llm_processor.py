@@ -432,14 +432,8 @@ IMPORTANT INSTRUCTIONS:
                 # Generate glossary for response text
                 glossary = self.extract_portuguese_words(response.choices[0].message.content)
 
-                # Also add words from user input that may not be in the response
-                user_glossary = self.extract_portuguese_words(question)
-
-                # Combine glossaries without duplicates
-                all_words = {item['word']: item for item in glossary + user_glossary}
-                combined_glossary = list(all_words.values())
-
-                return response.choices[0].message.content, True, colloquial_text, combined_glossary
+                # Only focus on words in the system response, not from user input
+                return response.choices[0].message.content, True, colloquial_text, glossary
             else:
                 # If not Portuguese, just respond normally in English
                 response = self.client.chat.completions.create(
