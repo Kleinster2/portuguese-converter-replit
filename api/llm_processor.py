@@ -333,7 +333,7 @@ Prepositions and Contractions (Lesson 2):
                             "Uma mesa de madeira (A wooden table) - material",
                             "Ela falou de você (She talked about you) - topic"
                         ]
-                        system_prompt += "\n\nWhen introducing the preposition 'de', provide these varied examples to show its versatility: " + "; ".join(preposition_examples)
+                        # system_prompt += "\n\nWhen introducing the preposition 'de', provide these varied examples to show its versatility: " + "; ".join(preposition_examples)
 
                 next_subtopic = None
 
