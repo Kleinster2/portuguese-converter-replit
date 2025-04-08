@@ -139,6 +139,48 @@ Self-introduction basics:
             logger.error(f"Error in transform_to_colloquial: {str(e)}")
             return text, f"Error: {str(e)}"
 
+    def extract_portuguese_words(self, text):
+        """
+        Extract Portuguese words from text and generate a glossary with meanings.
+        
+        Args:
+            text (str): Text that may contain Portuguese words
+            
+        Returns:
+            list: A list of dictionaries containing word and meaning
+        """
+        if not self.client:
+            return []
+            
+        try:
+            # Skip processing for very short texts or texts that are likely not Portuguese
+            if len(text.split()) <= 2 or "?" in text:
+                return []
+                
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{
+                    "role": "system",
+                    "content": "You are a Portuguese language assistant. Extract all Portuguese words from the given text and provide their English meanings. Format your response as a JSON array of objects with 'word' and 'meaning' keys. Only include actual Portuguese words, ignore English words or punctuation. If there are no Portuguese words, return an empty array."
+                }, {
+                    "role": "user",
+                    "content": text
+                }],
+                temperature=0.3,
+                response_format={"type": "json_object"}
+            )
+            
+            try:
+                import json
+                result = json.loads(response.choices[0].message.content)
+                return result.get("words", [])
+            except:
+                return []
+                
+        except Exception as e:
+            logger.error(f"Error in extract_portuguese_words: {str(e)}")
+            return []
+    
     def ask_question(self, question):
         """
         Interactive chat with LLM that detects Portuguese text and converts it if needed,
@@ -148,10 +190,10 @@ Self-introduction basics:
             question (str): User's input text/question
 
         Returns:
-            tuple: (response_text, has_portuguese, colloquial_version)
+            tuple: (response_text, has_portuguese, colloquial_version, glossary)
         """
         if not self.client:
-            return "Sorry, API key not configured.", False, None
+            return "Sorry, API key not configured.", False, None, []
 
         try:
             # Check if the user is showing agreement to start the syllabus or progress to next topic
@@ -322,9 +364,18 @@ Self-introduction basics:
 
                 # Convert the Portuguese text to colloquial form
                 colloquial_text, _ = self.transform_to_colloquial(question)
+                
+                # Generate glossary for response text
+                glossary = self.extract_portuguese_words(response.choices[0].message.content)
+                
+                # Also add words from user input that may not be in the response
+                user_glossary = self.extract_portuguese_words(question)
+                
+                # Combine glossaries without duplicates
+                all_words = {item['word']: item for item in glossary + user_glossary}
+                combined_glossary = list(all_words.values())
 
-                return response.choices[
-                    0].message.content, True, colloquial_text
+                return response.choices[0].message.content, True, colloquial_text, combined_glossary
             else:
                 # If not Portuguese, just respond normally in English
                 response = self.client.chat.completions.create(
@@ -340,9 +391,12 @@ Self-introduction basics:
                         "content": question
                     }],
                     temperature=0.7)
+                
+                # Generate glossary for any Portuguese words in the response
+                glossary = self.extract_portuguese_words(response.choices[0].message.content)
 
-                return response.choices[0].message.content, False, None
+                return response.choices[0].message.content, False, None, glossary
 
         except Exception as e:
             logger.error(f"Error in ask_question: {str(e)}")
-            return f"Error: {str(e)}", False, None
+            return f"Error: {str(e)}", False, None, []

@@ -178,6 +178,26 @@
             padding: 10px;
             font-style: italic;
         }
+
+        .glossary-section {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .glossary-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .glossary-item {
+            margin-bottom: 5px;
+        }
+
+        .portuguese-word {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -193,7 +213,7 @@
 Hi! I'm a Portuguese language tutor. I'll guide you through learning Brazilian Portuguese step by step.
 
 Let's start with the basic introduction:
-                
+
 Eu sou [name] = I am [name]
             </div>
         </div>
@@ -290,8 +310,26 @@ Eu sou [name] = I am [name]
 
                     addMessage(fullResponse, 'bot');
                 } else {
-                    // Just regular response
-                    addMessage(responseData.response, 'bot');
+                    // For regular responses without Portuguese detection
+                    if (responseData.glossary && responseData.glossary.length > 0) {
+                        // If we have glossary items, use the HTML version
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message bot-message`;
+
+                        let fullResponse = responseData.response;
+                        fullResponse += `\n\n<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
+                        responseData.glossary.forEach(item => {
+                            fullResponse += `<div class="glossary-item"><span class="portuguese-word">${item.word}</span> - ${item.meaning}</div>`;
+                        });
+                        fullResponse += `</div>`;
+
+                        messageDiv.innerHTML = fullResponse;
+                        chatMessages.appendChild(messageDiv);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    } else {
+                        // Just regular response without glossary
+                        addMessage(responseData.response, 'bot');
+                    }
                 }
 
             } catch (error) {

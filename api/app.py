@@ -216,10 +216,11 @@ def chat():
                 })
         else:
             # Regular chat interaction - detect Portuguese and show transformation if applicable
-            response, is_portuguese, colloquial_version = llm_processor.ask_question(user_text)
+            response, is_portuguese, colloquial_version, glossary = llm_processor.ask_question(user_text)
 
             result = {
-                'response': response
+                'response': response,
+                'glossary': glossary
             }
 
             # Include transformation if Portuguese was detected and this isn't a command/question
