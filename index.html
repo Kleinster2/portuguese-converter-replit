@@ -323,8 +323,13 @@ Eu sou [name] = I am [name]
                         const messageDiv = document.createElement('div');
                         messageDiv.className = `message bot-message`;
 
-                        let fullResponse = responseData.response;
-                        fullResponse += `\n\n<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
+                        // Convert newlines to <br> tags in the response text
+                        let formattedResponse = responseData.response.replace(/\n/g, '<br>');
+                        
+                        // Add a clear separation between response and glossary
+                        let fullResponse = formattedResponse;
+                        fullResponse += `<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
+                        
                         responseData.glossary.forEach(item => {
                             fullResponse += `<div class="glossary-item"><span class="portuguese-word">${item.word}</span> - ${item.meaning}</div>`;
                         });
