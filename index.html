@@ -317,20 +317,24 @@ Eu sou [name] = I am [name]
 
                     addMessage(fullResponse, 'bot');
                 } else {
-                    // For regular responses without Portuguese detection
+                    // Process response with glossary
+                    let fullResponse = responseData.response;
+
+                    // Always check for glossary items regardless of Portuguese detection
                     if (responseData.glossary && responseData.glossary.length > 0) {
-                        // If we have glossary items, use the HTML version
-                        let fullResponse = responseData.response.replace(/\n/g, '<br>');
+                        // Convert response text to HTML with line breaks
+                        fullResponse = responseData.response.replace(/\n/g, '<br>');
 
-                        if (responseData.glossary && responseData.glossary.length > 0) {
-                            fullResponse += `<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
+                        // Add the glossary section
+                        fullResponse += `<div class="glossary-section"><div class="glossary-title">Glossary:</div>`;
 
-                            responseData.glossary.forEach(item => {
-                                fullResponse += `<div class="glossary-item"><span class="portuguese-word">${item.word}</span> - ${item.meaning}</div>`;
-                            });
-                            fullResponse += `</div>`;
-                        }
+                        responseData.glossary.forEach(item => {
+                            fullResponse += `<div class="glossary-item"><span class="portuguese-word">${item.word}</span> - ${item.meaning}</div>`;
+                        });
 
+                        fullResponse += `</div>`;
+
+                        // Add formatted message with HTML
                         addMessage(fullResponse, 'bot');
                     } else {
                         // Just regular response without glossary

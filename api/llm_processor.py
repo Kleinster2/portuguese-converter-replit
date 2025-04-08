@@ -165,10 +165,7 @@ Prepositions and Contractions (Lesson 2):
             return []
 
         try:
-            # Skip processing for very short texts or texts that are likely not Portuguese
-            if len(text.split()) <= 2 or "?" in text:
-                return []
-
+            # Don't skip processing - always check for Portuguese words
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[{
@@ -185,21 +182,34 @@ Example format:
   ]
 }
 
-Only include actual Portuguese words and common phrases, ignore English words or punctuation. Focus on words that would be helpful for a language learner. Look specifically for Portuguese words that appear in quotation marks with English translations.
-If there are no Portuguese words, return {"words": []}.
+IMPORTANT INSTRUCTIONS:
+1. Focus on extracting Portuguese words in quotation marks with their English translations
+2. Look for patterns like "Portuguese phrase" - English translation
+3. Only include actual Portuguese words/phrases - ignore English words and punctuation
+4. Include all Portuguese words even if they appear multiple times in different contexts
+5. Make sure the glossary is comprehensive for a language learner
+6. If there are no Portuguese words, return {"words": []}
 """
                 }, {
                     "role": "user",
                     "content": text
                 }],
-                temperature=0.3,
+                temperature=0.2,
                 response_format={"type": "json_object"}
             )
 
             try:
                 import json
                 result = json.loads(response.choices[0].message.content)
-                return result.get("words", [])
+                words = result.get("words", [])
+                
+                # Log the extracted words for debugging
+                if words:
+                    logger.info(f"Extracted glossary: {words}")
+                else:
+                    logger.info("No glossary words extracted")
+                    
+                return words
             except Exception as e:
                 logger.error(f"Error parsing glossary JSON: {str(e)}")
                 return []
