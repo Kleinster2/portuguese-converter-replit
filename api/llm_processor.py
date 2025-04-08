@@ -59,7 +59,7 @@ IMPORTANT:
 
 Self-Introduction & Stress Rules, break it down into these subtopics to be taught in sequence:
 
-Self-introduction basics:
+Self-introduction basics (Lesson 1):
    - "Eu sou [name]" (I am [name])
    - "Eu sou de [city]" (I am from [city])
    - "Eu moro em [city]" (I live in [city])
@@ -68,6 +68,18 @@ Self-introduction basics:
    * Present these as a natural progression of introducing oneself
    * For city names, note that most don't use articles in Portuguese
    * Exceptions include Rio de Janeiro (masculine) and a few others
+
+Prepositions and Contractions (Lesson 2):
+   - "de" (of/from)
+   - "em" (in/on/at)
+   - "a" (to/at)
+   - "para" (for/to)
+   - "com" (with)
+   - Common contractions: no/na (em + o/a), do/da (de + o/a), ao/à (a + o/a)
+   
+   * Teach these prepositions with practical examples
+   * Focus on usage in everyday conversation
+   * Show how contractions form and when they're used
 
 """
 
@@ -310,8 +322,12 @@ Self-introduction basics:
                         next_subtopic = "C"
                     elif self.current_subtopic == "C":
                         next_subtopic = "D"
+                    elif self.current_subtopic == "D":
+                        # Move to the next lesson instead of looping back
+                        self.current_lesson = 2
+                        next_subtopic = "A"  # Start with first subtopic of next lesson
                     else:
-                        next_subtopic = "A"  # Cycle back to beginning if we're at the end
+                        next_subtopic = "A"  # Fallback in case of unexpected subtopic
 
                 # Track what the user has learned correctly
                 learned_phrases = []
