@@ -337,6 +337,8 @@ IMPORTANT INSTRUCTIONS:
                     is_correct = True
                     # Extract the user's name from the input
                     name_match = re.search(r'eu\s+sou\s+(\w+)', question.lower())
+                    # Create the system prompt with potential name acknowledgment
+                    system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
                     if name_match:
                         user_name = name_match.group(1)
                         # Add acknowledgment of the user's name to the system_prompt
@@ -406,7 +408,7 @@ IMPORTANT INSTRUCTIONS:
                     learned_phrases_text = "The user has correctly learned: " + ", ".join(learned_phrases) + ". Always remind them of these accomplishments before teaching new material."
 
                 # Always respond in English, even if user input is in Portuguese
-                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction + "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
+                system_prompt += "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
 
                 if is_correct and next_subtopic:
                     # When user demonstrates correct understanding, move to next topic
