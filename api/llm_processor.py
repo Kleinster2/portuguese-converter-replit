@@ -200,16 +200,21 @@ IMPORTANT INSTRUCTIONS:
 
             try:
                 import json
-                result = json.loads(response.choices[0].message.content)
-                words = result.get("words", [])
-                
-                # Log the extracted words for debugging
-                if words:
-                    logger.info(f"Extracted glossary: {words}")
-                else:
-                    logger.info("No glossary words extracted")
+                message_content = response.choices[0].message.content
+                if message_content is not None:
+                    result = json.loads(message_content)
+                    words = result.get("words", [])
                     
-                return words
+                    # Log the extracted words for debugging
+                    if words:
+                        logger.info(f"Extracted glossary: {words}")
+                    else:
+                        logger.info("No glossary words extracted")
+                        
+                    return words
+                else:
+                    logger.error("Empty response content; could not parse JSON.")
+                    return []
             except Exception as e:
                 logger.error(f"Error parsing glossary JSON: {str(e)}")
                 return []
