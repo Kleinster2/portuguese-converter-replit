@@ -22,7 +22,9 @@ class LLMProcessor:
         self.current_lesson = 1
         self.current_subtopic = "A"  # Start with the first subtopic
 
-        self.portuguese_tutor_prompt = """You are a helpful and friendly Portuguese tutor following a structured syllabus. 
+        self.portuguese_tutor_prompt = """You are a helpful and friendly Portuguese tutor following a structured syllabus.
+
+Use clear, structured formatting with separate paragraphs for different concepts and ideas. Break up text for better readability instead of long, dense paragraphs.
 
 Your teaching approach follows this structured progression:
 1. Self-Introduction & Stress Rules - Focusing on basic sentence structure (Subject+Verb+Complement) and first-person singular (eu)
@@ -336,13 +338,23 @@ IMPORTANT INSTRUCTIONS:
                     # Simple presence check for "Eu sou [something]" is sufficient
                     is_correct = True
                     # Extract the user's name from the input
+                    # Extract name while preserving original capitalization
                     name_match = re.search(r'eu\s+sou\s+(\w+)', question.lower())
                     # Create the system prompt with potential name acknowledgment
                     system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
                     if name_match:
-                        user_name = name_match.group(1)
-                        # Add acknowledgment of the user's name to the system_prompt
-                        system_prompt += f"\n\nThe user has shared their name as '{user_name}'. Begin your response by acknowledging this with 'Thank you for sharing your name, {user_name}!' before continuing with the next lesson step."
+                        # Get the original capitalized name from the input
+                        original_words = question.split()
+                        for i, word in enumerate(original_words):
+                            if word.lower() == name_match.group(1).lower() and i > 1:
+                                user_name = word  # Keep original capitalization
+                                break
+                        else:
+                            # Fallback: capitalize the first letter
+                            user_name = name_match.group(1).capitalize()
+                            
+                        # Add acknowledgment with improved formatting guidance
+                        system_prompt += f"\n\nThe user has shared their name as '{user_name}'. Begin your response by acknowledging this with 'Thank you for sharing your name, {user_name}!' before continuing with the next lesson step. Use separate paragraphs for clarity - do not bundle the acknowledgment, explanation, and examples into a single paragraph."
                 elif self.current_subtopic == "B" and has_demonstrated:
                     # Check if "Eu sou de [city]" is properly formed
                     is_correct = "eu sou de" in question.lower() and len(question.split()) >= 4
