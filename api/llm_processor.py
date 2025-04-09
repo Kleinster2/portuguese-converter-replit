@@ -1,4 +1,5 @@
 import os
+import re
 from openai import OpenAI
 from dotenv import load_dotenv
 import logging
@@ -334,6 +335,12 @@ IMPORTANT INSTRUCTIONS:
                 if self.current_subtopic == "A" and has_demonstrated:
                     # Simple presence check for "Eu sou [something]" is sufficient
                     is_correct = True
+                    # Extract the user's name from the input
+                    name_match = re.search(r'eu\s+sou\s+(\w+)', question.lower())
+                    if name_match:
+                        user_name = name_match.group(1)
+                        # Add acknowledgment of the user's name to the system_prompt
+                        system_prompt += f"\n\nThe user has shared their name as '{user_name}'. Begin your response by acknowledging this with 'Thank you for sharing your name, {user_name}!' before continuing with the next lesson step."
                 elif self.current_subtopic == "B" and has_demonstrated:
                     # Check if "Eu sou de [city]" is properly formed
                     is_correct = "eu sou de" in question.lower() and len(question.split()) >= 4
