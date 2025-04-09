@@ -298,8 +298,8 @@ IMPORTANT INSTRUCTIONS:
                 }],
                 temperature=0.1)
 
-            is_portuguese = "YES" in detect_response.choices[
-                0].message.content.upper()
+            message_content = detect_response.choices[0].message.content
+            is_portuguese = "YES" in message_content.upper() if message_content is not None else False
 
             # Additional instruction to focus strictly on the curriculum sequence
             sequence_instruction = "IMPORTANT: Never invite the user to divert from the established learning sequence. Always stay focused on offering the next step in the syllabus process. Only move forward once the user demonstrates understanding of the current topic."
