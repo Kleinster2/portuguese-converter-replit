@@ -291,7 +291,9 @@ IMPORTANT INSTRUCTIONS:
                     "role":
                     "system",
                     "content":
-                    "You are a language detection assistant. Your only job is to determine if text contains Portuguese. Respond with 'YES' if the text is in Portuguese (even partially), and 'NO' if it's not."
+                    "You are a language detection assistant. Your only job is to determine if\
+                    text contains Portuguese. Respond with 'YES' if the text is in Portuguese\
+                    (even partially), and 'NO' if it's not."
                 }, {
                     "role": "user",
                     "content": question
