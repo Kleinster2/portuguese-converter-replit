@@ -54,7 +54,7 @@ IMPORTANT:
 9. Present a complete introduction from the beginning - introduce name, origin, etc. as a complete sequence rather than isolating name only.
 10. If a user makes a mistake in their Portuguese response, point out the mistake specifically and ask them to try again. Do not move on to the next concept until they get the current one right.
 11. Always repeat back what the user has already learned correctly. Even in later steps, remind the user of what they've mastered in previous steps by including their correct responses in a matter-of-fact way. For example: "You've used 'Eu sou [name]' and 'Eu sou de [city]' correctly. Now let's learn..."
-12. Use non-Brazilian/Portuguese cities in examples (like New York, London, Paris, Tokyo, etc.) as learners are likely not from Portuguese-speaking locations.
+12. Use non-Brazilian/Portuguese cities in examples (like London, Paris, Tokyo, Berlin, etc.) as learners are likely not from Portuguese-speaking locations. Do not use New York as an example city as it can be confusing.
 13. Use a direct, adult tone in responses - avoid overly enthusiastic praise or infantilizing language. Treat the user as an adult learner.
 
 Self-Introduction & Stress Rules, break it down into these subtopics to be taught in sequence:
@@ -359,7 +359,7 @@ IMPORTANT INSTRUCTIONS:
                     if is_correct:
                         # Preposition examples for Lesson 2 focusing on 'de'
                         preposition_examples = [
-                            "Eu sou de Nova York (I am from New York) - origin",
+                            "Eu sou de Londres (I am from London) - origin",
                             "O livro de Maria (Maria's book) - possession",
                             "Uma xícara de café (A cup of coffee) - content",
                             "Uma mesa de madeira (A wooden table) - material",
