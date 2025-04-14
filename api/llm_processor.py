@@ -258,7 +258,8 @@ IMPORTANT INSTRUCTIONS:
                     "A": "self-introduction with 'Eu sou [name]'",
                     "B": "expressing hometown/origin with 'Eu sou de [city]'",
                     "C": "expressing current residence with 'Eu moro em [city]'",
-                    "D": "expressing language with 'Eu falo [language]'"
+                    "D": "expressing language with 'Eu falo [language]'",
+                    "review": "Review of Lesson 1"
                 }
 
                 # Use the current_subtopic to determine what to teach next
@@ -319,7 +320,8 @@ IMPORTANT INSTRUCTIONS:
                     "A": ["eu sou"],
                     "B": ["eu sou de"],
                     "C": ["eu moro em"],
-                    "D": ["eu falo"]
+                    "D": ["eu falo"],
+                    "review": ["review"]
                 }
 
                 # Make sure subtopic headers are properly formatted without step numbers
@@ -327,7 +329,8 @@ IMPORTANT INSTRUCTIONS:
                     "A": "Self-Introduction",
                     "B": "Expressing Origin",
                     "C": "Expressing Residence",
-                    "D": "Expressing Language"
+                    "D": "Expressing Language",
+                    "review": "Review of Lesson 1"
                 }
 
                 # Initialize system_prompt early to avoid scope issues
@@ -436,9 +439,16 @@ IMPORTANT INSTRUCTIONS:
                     elif self.current_subtopic == "C":
                         next_subtopic = "D"
                     elif self.current_subtopic == "D":
-                        # Move to the next lesson instead of looping back
-                        self.current_lesson = 2
-                        next_subtopic = "A"  # Start with first subtopic of next lesson
+                        # Add review before moving to lesson 2
+                        next_subtopic = "review"
+                    elif self.current_subtopic == "review":
+                        # After review, move to lesson 2
+                        if user_agreed or "ready" in question.lower() or "next" in question.lower():
+                            self.current_lesson = 2
+                            next_subtopic = "A"  # Start with first subtopic of next lesson
+                        else:
+                            # Keep in review mode until user confirms readiness
+                            next_subtopic = "review"
                     else:
                         next_subtopic = "A"  # Fallback in case of unexpected subtopic
 
@@ -468,7 +478,8 @@ IMPORTANT INSTRUCTIONS:
                         "A": "self-introduction with 'Eu sou [name]'",
                         "B": "expressing hometown/origin with 'Eu sou de [city]'",
                         "C": "expressing current residence with 'Eu moro em [city]'",
-                        "D": "expressing language with 'Eu falo [language]'"
+                        "D": "expressing language with 'Eu falo [language]'",
+                        "review": "Review of Lesson 1"
                     }
                     # Include headers without step numbers
                     subtopic_header = subtopic_headers[
@@ -479,6 +490,8 @@ IMPORTANT INSTRUCTIONS:
                     # Add specific guidance based on which subtopic we're moving to
                     if next_subtopic == "A" and self.current_lesson == 2:
                         system_prompt += "IMPORTANT: Now move to teaching Lesson 2 on prepositions, starting with 'de'. Do NOT suggest more languages to speak. Introduce the preposition 'de' and its uses. Provide clear examples."
+                    elif next_subtopic == "review":
+                        system_prompt += "Before moving to Lesson 2 on prepositions, provide a comprehensive review of Lesson 1. Summarize all four components they've learned: 'Eu sou [name]', 'Eu sou de [city]', 'Eu moro em [city]', and 'Eu falo [language]'. Use the user's actual provided information in your examples. After this review, instruct the user to confirm when they're ready to proceed to Lesson 2."
                     else:
                         system_prompt += "Then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept."
 
