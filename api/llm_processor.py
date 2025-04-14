@@ -81,6 +81,22 @@ Definite Articles (Lesson 2):
    - "os" (the - masculine plural)
    - "as" (the - feminine plural)
 
+   Masculine singular examples:
+   * "o livro" (the book)
+   * "o carro" (the car)
+   * "o restaurante" (the restaurant)
+   * "o telefone" (the telephone)
+   * "o dia" (the day)
+   * "o professor" (the teacher)
+
+   Feminine singular examples:
+   * "a casa" (the house)
+   * "a mesa" (the table)
+   * "a cadeira" (the chair)
+   * "a loja" (the store)
+   * "a noite" (the night)
+   * "a professora" (the teacher - female)
+
    * Teach these articles with practical examples
    * Focus on usage in everyday conversation
    * Show how articles agree with nouns in gender and number
