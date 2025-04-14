@@ -333,6 +333,9 @@ IMPORTANT INSTRUCTIONS:
                 # Initialize system_prompt early to avoid scope issues
                 system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
 
+                # Track user information
+                self.user_info = getattr(self, 'user_info', {})
+                
                 current_pattern = subtopics[self.current_subtopic][0].lower()
                 # Check if user has demonstrated the current topic correctly
                 has_demonstrated = current_pattern in question.lower()
@@ -357,17 +360,41 @@ IMPORTANT INSTRUCTIONS:
                             # Fallback: capitalize the first letter
                             user_name = name_match.group(1).capitalize()
 
+                        # Store user's name for future references
+                        self.user_info['name'] = user_name
+
                         # Add acknowledgment with improved formatting guidance
                         system_prompt += f"\n\nThe user has shared their name as '{user_name}'. Begin your response by acknowledging this with 'Thank you for sharing your name, {user_name}!' before continuing with the next lesson step. Use separate paragraphs for clarity - do not bundle the acknowledgment, explanation, and examples into a single paragraph."
                 elif self.current_subtopic == "B" and has_demonstrated:
                     # Check if "Eu sou de [city]" is properly formed
                     is_correct = "eu sou de" in question.lower() and len(question.split()) >= 4
+                    
+                    # Extract the user's hometown
+                    city_match = re.search(r'eu\s+sou\s+de\s+(\w+(?:\s+\w+)*)', question.lower())
+                    if city_match:
+                        # Get the hometown from input preserving capitalization
+                        hometown = " ".join(word for word in question.split()[3:])
+                        self.user_info['hometown'] = hometown
                 elif self.current_subtopic == "C" and has_demonstrated:
                     # Check if "Eu moro em [city]" is properly formed
                     is_correct = "eu moro em" in question.lower() and len(question.split()) >= 4
+                    
+                    # Extract the user's current city
+                    city_match = re.search(r'eu\s+moro\s+em\s+(\w+(?:\s+\w+)*)', question.lower())
+                    if city_match:
+                        # Get the current city from input preserving capitalization
+                        current_city = " ".join(word for word in question.split()[3:])
+                        self.user_info['current_city'] = current_city
                 elif self.current_subtopic == "D" and has_demonstrated:
                     # Check if "Eu falo [language]" is properly formed
                     is_correct = "eu falo" in question.lower() and len(question.split()) >= 3
+
+                    # Extract the language if properly formed
+                    lang_match = re.search(r'eu\s+falo\s+(\w+(?:\s+\w+)*)', question.lower())
+                    if lang_match and is_correct:
+                        # Get the language from input preserving capitalization
+                        language = " ".join(word for word in question.split()[2:])
+                        self.user_info['language'] = language
 
                     # Check for common English language names that should be in Portuguese
                     english_languages = ["english", "japanese", "spanish", "french", "german", "italian", "chinese"]
@@ -409,19 +436,22 @@ IMPORTANT INSTRUCTIONS:
                     else:
                         next_subtopic = "A"  # Fallback in case of unexpected subtopic
 
-                # Track what the user has learned correctly
+                # Track what the user has learned correctly with actual user information
                 learned_phrases = []
                 if self.current_subtopic >= "B":
-                    learned_phrases.append("Eu sou [name]")
+                    name = self.user_info.get('name', '[name]')
+                    learned_phrases.append(f"Eu sou {name}")
                 if self.current_subtopic >= "C":
-                    learned_phrases.append("Eu sou de [city]")
+                    hometown = self.user_info.get('hometown', '[city]')
+                    learned_phrases.append(f"Eu sou de {hometown}")
                 if self.current_subtopic >= "D":
-                    learned_phrases.append("Eu moro em [city]")
+                    current_city = self.user_info.get('current_city', '[city]')
+                    learned_phrases.append(f"Eu moro em {current_city}")
 
                 # Prepare phrases already learned for inclusion in the prompt
                 learned_phrases_text = ""
                 if learned_phrases:
-                    learned_phrases_text = "The user has correctly learned: " + ", ".join(learned_phrases) + ". Always remind them of these accomplishments before teaching new material."
+                    learned_phrases_text = "The user has correctly learned these specific phrases: " + ", ".join(learned_phrases) + ". Always use these exact phrases with their specific information when reminding them of what they've learned, rather than using placeholders like [name] or [city]."
 
                 # Always respond in English, even if user input is in Portuguese
                 system_prompt += "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
