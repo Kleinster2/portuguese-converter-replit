@@ -71,6 +71,7 @@ Self-introduction basics (Lesson 1):
    * Present these as a natural progression of introducing oneself
    * For city names, note that most don't use articles in Portuguese
    * Exceptions include Rio de Janeiro (masculine) and a few others
+   * Use cities like Paris, London, Tokyo, Berlin, etc. for examples
 
 Prepositions and Contractions (Lesson 2):
    - "de" (of/from)
@@ -207,13 +208,13 @@ IMPORTANT INSTRUCTIONS:
                 if message_content is not None:
                     result = json.loads(message_content)
                     words = result.get("words", [])
-                    
+
                     # Log the extracted words for debugging
                     if words:
                         logger.info(f"Extracted glossary: {words}")
                     else:
                         logger.info("No glossary words extracted")
-                        
+
                     return words
                 else:
                     logger.error("Empty response content; could not parse JSON.")
@@ -328,6 +329,9 @@ IMPORTANT INSTRUCTIONS:
                     "D": "Expressing Language"
                 }
 
+                # Initialize system_prompt early to avoid scope issues
+                system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
+
                 current_pattern = subtopics[self.current_subtopic][0].lower()
                 # Check if user has demonstrated the current topic correctly
                 has_demonstrated = current_pattern in question.lower()
@@ -340,8 +344,7 @@ IMPORTANT INSTRUCTIONS:
                     # Extract the user's name from the input
                     # Extract name while preserving original capitalization
                     name_match = re.search(r'eu\s+sou\s+(\w+)', question.lower())
-                    # Create the system prompt with potential name acknowledgment
-                    system_prompt = self.portuguese_tutor_prompt + "\n\n" + sequence_instruction
+                    # Create or update the system prompt with potential name acknowledgment
                     if name_match:
                         # Get the original capitalized name from the input
                         original_words = question.split()
@@ -352,7 +355,7 @@ IMPORTANT INSTRUCTIONS:
                         else:
                             # Fallback: capitalize the first letter
                             user_name = name_match.group(1).capitalize()
-                            
+
                         # Add acknowledgment with improved formatting guidance
                         system_prompt += f"\n\nThe user has shared their name as '{user_name}'. Begin your response by acknowledging this with 'Thank you for sharing your name, {user_name}!' before continuing with the next lesson step. Use separate paragraphs for clarity - do not bundle the acknowledgment, explanation, and examples into a single paragraph."
                 elif self.current_subtopic == "B" and has_demonstrated:
