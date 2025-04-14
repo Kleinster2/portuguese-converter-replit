@@ -400,11 +400,17 @@ IMPORTANT INSTRUCTIONS:
                     english_languages = ["english", "japanese", "spanish", "french", "german", "italian", "chinese"]
                     portuguese_languages = ["inglês", "japonês", "espanhol", "francês", "alemão", "italiano", "chinês"]
 
-                    # If the user used an English language name, we'll consider it a teaching moment
-                    # but not mark it as correct to prompt the proper correction
-                    for lang in english_languages:
-                        if lang.lower() in question.lower():
+                    # For inglês (English), be more lenient with accent mark
+                    if "ingles" in question.lower() and "inglês" not in question.lower():
+                        # Accept "ingles" without accent for English speakers
+                        is_correct = True
+                        self.user_info['language'] = "inglês"
+                    
+                    # For other English language names, suggest correction
+                    for i, lang in enumerate(english_languages):
+                        if lang.lower() in question.lower() and lang.lower() != "english":
                             is_correct = False
+                            system_prompt += f"\n\nThe user attempted to say they speak {lang}, but used the English word. Suggest the Portuguese word '{portuguese_languages[i]}' instead."
                             break
 
                     # If moving to next lesson (Lesson 2 on prepositions)
@@ -417,7 +423,7 @@ IMPORTANT INSTRUCTIONS:
                             "Uma mesa de madeira (A wooden table) - material",
                             "Ela falou de você (She talked about you) - topic"
                         ]
-                        # system_prompt += "\n\nWhen introducing the preposition 'de', provide these varied examples to show its versatility: " + "; ".join(preposition_examples)
+                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on prepositions. Begin teaching about the preposition 'de' and its various uses."
 
                 next_subtopic = None
 
@@ -468,7 +474,15 @@ IMPORTANT INSTRUCTIONS:
                     subtopic_header = subtopic_headers[
                         next_subtopic] if 'subtopic_headers' in locals(
                         ) else f"{next_topic_names[next_subtopic].capitalize()}"
-                    system_prompt += "\n\nThe user has demonstrated correct understanding of the current topic.  Then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept. DO NOT mention any step numbers or step identifiers in your response."
+                    system_prompt += "\n\nThe user has demonstrated correct understanding of the current topic. "
+                    
+                    # Add specific guidance based on which subtopic we're moving to
+                    if next_subtopic == "A" and self.current_lesson == 2:
+                        system_prompt += "IMPORTANT: Now move to teaching Lesson 2 on prepositions, starting with 'de'. Do NOT suggest more languages to speak. Introduce the preposition 'de' and its uses. Provide clear examples."
+                    else:
+                        system_prompt += "Then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept."
+                    
+                    system_prompt += " DO NOT mention any step numbers or step identifiers in your response."
                 elif has_demonstrated and not is_correct:
                     # User attempted but made a mistake
                     system_prompt += "\n\nThe user has attempted the current topic but made a mistake. Point out the specific error in their Portuguese response and ask them to try again. Provide the correct pattern again as a reminder. Do NOT move on to the next topic until they get this right."
