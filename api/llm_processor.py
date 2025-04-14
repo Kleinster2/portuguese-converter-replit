@@ -57,7 +57,7 @@ IMPORTANT:
 9. Present a complete introduction from the beginning - introduce name, origin, etc. as a complete sequence rather than isolating name only.
 10. If a user makes a mistake in their Portuguese response, point out the mistake specifically and ask them to try again. Do not move on to the next concept until they get the current one right.
 11. Always repeat back what the user has already learned correctly. Even in later steps, remind the user of what they've mastered in previous steps by including their correct responses in a matter-of-fact way. For example: "You've used 'Eu sou [name]' and 'Eu sou de [city]' correctly. Now let's learn..."
-12. Use non-Brazilian/Portuguese cities in examples (like London, Paris, Tokyo, Berlin, etc.) as learners are likely not from Portuguese-speaking locations. Do not use New York as an example city as it can be confusing.
+12. Use non-Brazilian/Portuguese cities in examples (like Nova York, London, Paris, Tokyo, Berlin, etc.) as learners are likely not from Portuguese-speaking locations.
 13. Use a direct, adult tone in responses - avoid overly enthusiastic praise or infantilizing language. Treat the user as an adult learner.
 
 Self-Introduction & Stress Rules, break it down into these subtopics to be taught in sequence:
@@ -335,7 +335,7 @@ IMPORTANT INSTRUCTIONS:
 
                 # Track user information
                 self.user_info = getattr(self, 'user_info', {})
-                
+
                 current_pattern = subtopics[self.current_subtopic][0].lower()
                 # Check if user has demonstrated the current topic correctly
                 has_demonstrated = current_pattern in question.lower()
@@ -368,7 +368,7 @@ IMPORTANT INSTRUCTIONS:
                 elif self.current_subtopic == "B" and has_demonstrated:
                     # Check if "Eu sou de [city]" is properly formed
                     is_correct = "eu sou de" in question.lower() and len(question.split()) >= 4
-                    
+
                     # Extract the user's hometown
                     city_match = re.search(r'eu\s+sou\s+de\s+(\w+(?:\s+\w+)*)', question.lower())
                     if city_match:
@@ -378,7 +378,7 @@ IMPORTANT INSTRUCTIONS:
                 elif self.current_subtopic == "C" and has_demonstrated:
                     # Check if "Eu moro em [city]" is properly formed
                     is_correct = "eu moro em" in question.lower() and len(question.split()) >= 4
-                    
+
                     # Extract the user's current city
                     city_match = re.search(r'eu\s+moro\s+em\s+(\w+(?:\s+\w+)*)', question.lower())
                     if city_match:
@@ -405,7 +405,7 @@ IMPORTANT INSTRUCTIONS:
                         # Accept "ingles" without accent for English speakers
                         is_correct = True
                         self.user_info['language'] = "inglês"
-                    
+
                     # For other English language names, suggest correction
                     for i, lang in enumerate(english_languages):
                         if lang.lower() in question.lower() and lang.lower() != "english":
@@ -475,13 +475,13 @@ IMPORTANT INSTRUCTIONS:
                         next_subtopic] if 'subtopic_headers' in locals(
                         ) else f"{next_topic_names[next_subtopic].capitalize()}"
                     system_prompt += "\n\nThe user has demonstrated correct understanding of the current topic. "
-                    
+
                     # Add specific guidance based on which subtopic we're moving to
                     if next_subtopic == "A" and self.current_lesson == 2:
                         system_prompt += "IMPORTANT: Now move to teaching Lesson 2 on prepositions, starting with 'de'. Do NOT suggest more languages to speak. Introduce the preposition 'de' and its uses. Provide clear examples."
                     else:
                         system_prompt += "Then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept."
-                    
+
                     system_prompt += " DO NOT mention any step numbers or step identifiers in your response."
                 elif has_demonstrated and not is_correct:
                     # User attempted but made a mistake
