@@ -447,7 +447,7 @@ IMPORTANT INSTRUCTIONS:
                             "Os livros (The books) - masculine plural",
                             "As casas (The houses) - feminine plural"
                         ]
-                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Provide clear examples showing gender and number agreement."
+                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Provide clear examples showing gender and number agreement. DO NOT mention or preview any lessons beyond Lesson 2."
 
                 next_subtopic = None
 
@@ -491,7 +491,7 @@ IMPORTANT INSTRUCTIONS:
                     learned_phrases_text = "The user has correctly learned these specific phrases: " + ", ".join(learned_phrases) + ". Always use these exact phrases with their specific information when reminding them of what they've learned, rather than using placeholders like [name] or [city]."
 
                 # Always respond in English, even if user input is in Portuguese
-                system_prompt += "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user."
+                system_prompt += "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user. DO NOT reveal the upcoming sequence of lessons or phrases - focus only on the current lesson being taught. Do not mention or preview any future lessons beyond the current one."
 
                 if is_correct and next_subtopic:
                     # When user demonstrates correct understanding, move to next topic
