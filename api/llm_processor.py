@@ -409,11 +409,17 @@ IMPORTANT INSTRUCTIONS:
                         is_correct = True
                         self.user_info['language'] = "inglês"
 
-                    # For other English language names, suggest correction
+                    # For other English language names, provide guidance instead of marking as incorrect
                     for i, lang in enumerate(english_languages):
                         if lang.lower() in question.lower() and lang.lower() != "english":
-                            is_correct = False
-                            system_prompt += f"\n\nThe user attempted to say they speak {lang}, but used the English word. Suggest the Portuguese word '{portuguese_languages[i]}' instead."
+                            # Store the language the user is trying to express
+                            self.user_info['language'] = portuguese_languages[i]
+                            
+                            # The sentence is structurally correct, just needs vocabulary help
+                            is_correct = True
+                            
+                            # Add teaching guidance rather than error correction
+                            system_prompt += f"\n\nI noticed the user used the English word '{lang}' in their Portuguese sentence. This is a learning opportunity, not a mistake. Teach them that the Portuguese word for '{lang}' is '{portuguese_languages[i]}'. Acknowledge that their sentence structure was correct, and they're learning new vocabulary."
                             break
 
                     # If moving to next lesson (Lesson 2 on prepositions)
