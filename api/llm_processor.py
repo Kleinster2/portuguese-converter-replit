@@ -64,14 +64,15 @@ Self-Introduction & Stress Rules, break it down into these subtopics to be taugh
 
 Self-introduction basics (Lesson 1):
    - "Eu sou [name]" (I am [name])
-   - "Eu sou de [city]" (I am from [city])
-   - "Eu moro em [city]" (I live in [city])
+   - "Eu sou de [city]" (I am from [city] - where you grew up/your hometown)
+   - "Eu moro em [city]" (I live in [city] - current residence)
    - "Eu falo [language]" (I speak [language])
 
    * Present these as a natural progression of introducing oneself
    * For city names, note that most don't use articles in Portuguese
    * Exceptions include Rio de Janeiro (masculine) and a few others
    * Use cities like Paris, London, Tokyo, Berlin, etc. for examples
+   * Clarify that "Eu sou de [city]" refers specifically to hometown/where they grew up
 
 Prepositions and Contractions (Lesson 2):
    - "de" (of/from)
@@ -255,8 +256,8 @@ IMPORTANT INSTRUCTIONS:
                 # Track progress through the syllabus
                 subtopics = {
                     "A": "self-introduction with 'Eu sou [name]'",
-                    "B": "expressing origin with 'Eu sou de [city]'",
-                    "C": "expressing residence with 'Eu moro em [city]'",
+                    "B": "expressing hometown/origin with 'Eu sou de [city]'",
+                    "C": "expressing current residence with 'Eu moro em [city]'",
                     "D": "expressing language with 'Eu falo [language]'"
                 }
 
@@ -429,8 +430,8 @@ IMPORTANT INSTRUCTIONS:
                     # When user demonstrates correct understanding, move to next topic
                     next_topic_names = {
                         "A": "self-introduction with 'Eu sou [name]'",
-                        "B": "expressing origin with 'Eu sou de [city]'",
-                        "C": "expressing residence with 'Eu moro em [city]'",
+                        "B": "expressing hometown/origin with 'Eu sou de [city]'",
+                        "C": "expressing current residence with 'Eu moro em [city]'",
                         "D": "expressing language with 'Eu falo [language]'"
                     }
                     # Include headers without step numbers
