@@ -29,15 +29,16 @@ Use clear, structured formatting with separate paragraphs for different concepts
 Your teaching approach follows this structured progression:
 1. Self-Introduction & Stress Rules - Focusing on basic sentence structure (Subject+Verb+Complement) and first-person singular (eu)
 2. Definite Articles - 'o', 'a', 'os', 'as', and their usage based on gender and number
-3. Regular Verbs in Present Indicative - Three verb classes (-ar, -er, -ir) with emphasis on first-person forms
-4. Verbs ser/estar - Distinctions and usage in first-person forms
-5. Irregular Verbs in Present Tense - Key irregular verbs (ter, ir, fazer, poder, etc.) in first-person
-6. Pretérito Perfeito for Regular Verbs - Past tense focusing on first-person forms
-7. Nouns, Articles and Agreement - Gender, number, and agreement rules
-8. Pretérito Perfeito for Irregular Verbs - Past tense of common irregular verbs
-9. Periphrastic Future - Using ir (present) + infinitive structure
-10. Demonstratives and Possession - This/that distinctions and possessive forms
-11. Advanced topics: plurals, questions, commands, reflexive verbs, and other tenses
+3. Prepositions and Contractions - Core prepositions (de, em, a, para, com) and common contractions
+4. Regular Verbs in Present Indicative - Three verb classes (-ar, -er, -ir) with emphasis on first-person forms
+5. Verbs ser/estar - Distinctions and usage in first-person forms
+6. Irregular Verbs in Present Tense - Key irregular verbs (ter, ir, fazer, poder, etc.) in first-person
+7. Pretérito Perfeito for Regular Verbs - Past tense focusing on first-person forms
+8. Nouns, Articles and Agreement - Gender, number, and agreement rules
+9. Pretérito Perfeito for Irregular Verbs - Past tense of common irregular verbs
+10. Periphrastic Future - Using ir (present) + infinitive structure
+11. Demonstratives and Possession - This/that distinctions and possessive forms
+12. Advanced topics: plurals, questions, commands, reflexive verbs, and other tenses
 
 At all times, guide users through this sequence step by step. If they ask about something else, help them, but always find a way to nudge them back to the next step in the curriculum. Help the user by correcting spelling, syntax and grammar of any Portuguese text. Transform written Portuguese into concise spoken Portuguese using our rule-based approach. 
 
@@ -423,13 +424,12 @@ IMPORTANT INSTRUCTIONS:
 
                     # If moving to next lesson (Lesson 2 on prepositions)
                     if is_correct:
-                        # Preposition examples for Lesson 2 focusing on 'de'
-                        preposition_examples = [
-                            "Eu sou de Londres (I am from London) - origin",
-                            "O livro de Maria (Maria's book) - possession",
-                            "Uma xícara de café (A cup of coffee) - content",
-                            "Uma mesa de madeira (A wooden table) - material",
-                            "Ela falou de você (She talked about you) - topic"
+                        # Examples for definite articles in Lesson 2
+                        article_examples = [
+                            "O livro (The book) - masculine singular",
+                            "A casa (The house) - feminine singular",
+                            "Os livros (The books) - masculine plural",
+                            "As casas (The houses) - feminine plural"
                         ]
                         system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Provide clear examples showing gender and number agreement."
 
@@ -495,6 +495,8 @@ IMPORTANT INSTRUCTIONS:
                     # Add specific guidance based on which subtopic we're moving to
                     if next_subtopic == "A" and self.current_lesson == 2:
                         system_prompt += "IMPORTANT: Now move to teaching Lesson 2 on definite articles. Do NOT suggest more languages to speak. Introduce the definite articles 'o', 'a', 'os', 'as' and explain when to use them. Provide clear examples showing gender and number agreement."
+                    elif next_subtopic == "A" and self.current_lesson == 3:
+                        system_prompt += "IMPORTANT: Now move to teaching Lesson 3 on prepositions and contractions. Introduce the preposition 'de' and its various uses. Provide clear examples of how prepositions are used in everyday conversation."
                     elif next_subtopic == "review":
                         system_prompt += "Before moving to Lesson 2 on definite articles, provide a comprehensive review of Lesson 1. Summarize all four components they've learned: 'Eu sou [name]', 'Eu sou de [city]', 'Eu moro em [city]', and 'Eu falo [language]'. Use the user's actual provided information in your examples. After this review, instruct the user to confirm when they're ready to proceed to Lesson 2."
                     else:
