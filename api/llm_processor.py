@@ -28,7 +28,7 @@ Use clear, structured formatting with separate paragraphs for different concepts
 
 Your teaching approach follows this structured progression:
 1. Self-Introduction & Stress Rules - Focusing on basic sentence structure (Subject+Verb+Complement) and first-person singular (eu)
-2. Prepositions and Contractions - Core prepositions (de, em, a, para, com) and common contractions
+2. Definite Articles - 'o', 'a', 'os', 'as', and their usage based on gender and number
 3. Regular Verbs in Present Indicative - Three verb classes (-ar, -er, -ir) with emphasis on first-person forms
 4. Verbs ser/estar - Distinctions and usage in first-person forms
 5. Irregular Verbs in Present Tense - Key irregular verbs (ter, ir, fazer, poder, etc.) in first-person
@@ -74,17 +74,16 @@ Self-introduction basics (Lesson 1):
    * Use cities like Paris, London, Tokyo, Berlin, etc. for examples
    * Clarify that "Eu sou de [city]" refers specifically to hometown/where they grew up
 
-Prepositions and Contractions (Lesson 2):
-   - "de" (of/from)
-   - "em" (in/on/at)
-   - "a" (to/at)
-   - "para" (for/to)
-   - "com" (with)
-   - Common contractions: no/na (em + o/a), do/da (de + o/a), ao/à (a + o/a)
+Definite Articles (Lesson 2):
+   - "o" (the - masculine singular)
+   - "a" (the - feminine singular)
+   - "os" (the - masculine plural)
+   - "as" (the - feminine plural)
 
-   * Teach these prepositions with practical examples
+   * Teach these articles with practical examples
    * Focus on usage in everyday conversation
-   * Show how contractions form and when they're used
+   * Show how articles agree with nouns in gender and number
+
 
 """
 
@@ -414,10 +413,10 @@ IMPORTANT INSTRUCTIONS:
                         if lang.lower() in question.lower() and lang.lower() != "english":
                             # Store the language the user is trying to express
                             self.user_info['language'] = portuguese_languages[i]
-                            
+
                             # The sentence is structurally correct, just needs vocabulary help
                             is_correct = True
-                            
+
                             # Add teaching guidance rather than error correction
                             system_prompt += f"\n\nI noticed the user used the English word '{lang}' in their Portuguese sentence. This is a learning opportunity, not a mistake. Teach them that the Portuguese word for '{lang}' is '{portuguese_languages[i]}'. Acknowledge that their sentence structure was correct, and they're learning new vocabulary."
                             break
@@ -432,7 +431,7 @@ IMPORTANT INSTRUCTIONS:
                             "Uma mesa de madeira (A wooden table) - material",
                             "Ela falou de você (She talked about you) - topic"
                         ]
-                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on prepositions. Begin teaching about the preposition 'de' and its various uses."
+                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Provide clear examples showing gender and number agreement."
 
                 next_subtopic = None
 
@@ -495,9 +494,9 @@ IMPORTANT INSTRUCTIONS:
 
                     # Add specific guidance based on which subtopic we're moving to
                     if next_subtopic == "A" and self.current_lesson == 2:
-                        system_prompt += "IMPORTANT: Now move to teaching Lesson 2 on prepositions, starting with 'de'. Do NOT suggest more languages to speak. Introduce the preposition 'de' and its uses. Provide clear examples."
+                        system_prompt += "IMPORTANT: Now move to teaching Lesson 2 on definite articles. Do NOT suggest more languages to speak. Introduce the definite articles 'o', 'a', 'os', 'as' and explain when to use them. Provide clear examples showing gender and number agreement."
                     elif next_subtopic == "review":
-                        system_prompt += "Before moving to Lesson 2 on prepositions, provide a comprehensive review of Lesson 1. Summarize all four components they've learned: 'Eu sou [name]', 'Eu sou de [city]', 'Eu moro em [city]', and 'Eu falo [language]'. Use the user's actual provided information in your examples. After this review, instruct the user to confirm when they're ready to proceed to Lesson 2."
+                        system_prompt += "Before moving to Lesson 2 on definite articles, provide a comprehensive review of Lesson 1. Summarize all four components they've learned: 'Eu sou [name]', 'Eu sou de [city]', 'Eu moro em [city]', and 'Eu falo [language]'. Use the user's actual provided information in your examples. After this review, instruct the user to confirm when they're ready to proceed to Lesson 2."
                     else:
                         system_prompt += "Then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept."
 
