@@ -266,7 +266,7 @@ IMPORTANT INSTRUCTIONS:
                 "sounds good", "that's good", "i'm ready", "ready"
             ]
 
-            user_agreed = question.lower().strip() in agreement_words
+            user_agreed = question.lower().strip() in agreement_words or "ready" in question.lower().strip()
 
             if user_agreed:
                 # Track progress through the syllabus
@@ -472,7 +472,7 @@ IMPORTANT INSTRUCTIONS:
                                 model="gpt-4o",
                                 messages=[{
                                     "role": "system",
-                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Transition to teaching 'o', 'a', 'os', 'as' and their usage."
+                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Skip any further review and transition directly to teaching 'o', 'a', 'os', 'as' and their usage. Do not ask for confirmation again or review Lesson 1 material."
                                 }, {
                                     "role": "user",
                                     "content": "I'm ready to start Lesson 2"
