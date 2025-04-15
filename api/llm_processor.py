@@ -304,7 +304,7 @@ IMPORTANT INSTRUCTIONS:
                     temperature=0.5)
 
                 return syllabus_response.choices[
-                    0].message.content, False, None
+                    0].message.content, False, None, []
 
             # First determine if the text contains Portuguese
             detect_response = self.client.chat.completions.create(
@@ -467,12 +467,31 @@ IMPORTANT INSTRUCTIONS:
                         if user_agreed or "ready" in question.lower() or "next" in question.lower():
                             self.current_lesson = 2
                             next_subtopic = "A"  # Start with first subtopic of next lesson
+                            # Create an explicit response for the transition to Lesson 2
+                            response = self.client.chat.completions.create(
+                                model="gpt-4o",
+                                messages=[{
+                                    "role": "system",
+                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Transition to teaching 'o', 'a', 'os', 'as' and their usage."
+                                }, {
+                                    "role": "user",
+                                    "content": "I'm ready to start Lesson 2"
+                                }],
+                                temperature=0.7)
+
+                            # Generate glossary for response text
+                            glossary = self.extract_portuguese_words(response.choices[0].message.content)
+
+                            # Move to next subtopic AFTER generating response
+                            self.current_subtopic = next_subtopic
+                            self.current_lesson = 2
+
+                            return response.choices[0].message.content, False, None, glossary
                         else:
                             # Keep in review mode until user confirms readiness
                             next_subtopic = "review"
                     else:
                         next_subtopic = "A"  # Fallback in case of unexpected subtopic
-
                 # Track what the user has learned correctly with actual user information
                 learned_phrases = []
                 if self.current_subtopic >= "B":
