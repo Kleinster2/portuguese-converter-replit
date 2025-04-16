@@ -84,18 +84,33 @@ Definite Articles (Lesson 2):
    Masculine singular examples:
    * "o livro" (the book)
    * "o carro" (the car)
-   * "o tempo" (the restaurant)
+   * "o computador" (the computer)
    * "o professor" (the teacher)
 
    Feminine singular examples:
    * "a mesa" (the table)
    * "a cadeira" (the chair)
-   * "a loja" (the store)
+   * "a caneta" (the pen)
    * "a professora" (the teacher - female)
 
-   * Teach these articles with practical examples
-   * Focus on usage in everyday conversation
-   * Show how articles agree with nouns in gender and number
+   Masculine plural examples:
+   * "os livros" (the books)
+   * "os carros" (the cars)
+   * "os computadores" (the computers)
+   * "os professores" (the teachers)
+
+   Feminine plural examples:
+   * "as mesas" (the tables)
+   * "as cadeiras" (the chairs)
+   * "as canetas" (the pens)
+   * "as professoras" (the teachers - female)
+
+   IMPORTANT TEACHING GUIDELINES:
+   * Focus ONLY on basic article usage with common nouns
+   * DO NOT connect articles to previous lessons or city names
+   * DO NOT discuss exceptions to article usage patterns at this stage
+   * Teach one concept at a time - don't overwhelm with multiple grammar points
+   * Show clearly how articles agree with nouns in both gender and number
 
 
 """
@@ -454,7 +469,7 @@ IMPORTANT INSTRUCTIONS:
                         system_prompt += "\n\nIMPORTANT: The user has successfully completed 'Eu moro em' and should now learn 'Eu falo' before moving to Lesson 2. Guide the user to practice 'Eu falo [language]' (I speak [language]) and only move to Lesson 2 after they've demonstrated this correctly."
                     # Only show definite articles prompt when we're actually moving to Lesson 2 (after review)
                     elif is_correct and self.current_subtopic == "review":
-                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Start with masculine singular ('o'). Provide clear examples showing gender and number agreement. DO NOT mention or preview any lessons beyond Lesson 2. DO NOT ASK FOR CONFIRMATION - assume the user is ready to begin Lesson 2."
+                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak, DO NOT request any practice or examples from the user, and DO NOT mention cities or previous material. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage with everyday objects (not cities or names). Provide clear examples showing gender and number agreement with common nouns. DO NOT request any writing from the user or ask them to demonstrate what they've learned. DO NOT mention or preview any lessons beyond Lesson 2. DO NOT ASK FOR CONFIRMATION - assume the user is ready to begin Lesson 2."
 
                 next_subtopic = None
 
@@ -486,12 +501,32 @@ IMPORTANT INSTRUCTIONS:
                                 model="gpt-4.1-mini",
                                 messages=[{
                                     "role": "system",
-                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Skip any further review and transition directly to teaching ONLY the definite articles with simple noun examples. Begin with 'o' (masculine singular) and provide clear examples like 'o livro' (the book), 'o carro' (the car). Then teach 'a' (feminine singular) with examples like 'a mesa' (the table), 'a cadeira' (the chair). Then teach 'os' (masculine plural) and 'as' (feminine plural) with appropriate examples. DO NOT mention city names or connect to previous material. Focus ONLY on explaining the definite articles and their basic usage patterns with everyday objects."
+                                    "content": """You are a Portuguese language tutor starting Lesson 2 on definite articles.
+
+IMPORTANT CONSTRAINTS:
+1. DO NOT review or mention ANY previous lesson material
+2. DO NOT mention cities or self-introductions
+3. DO NOT ask for ANY homework, practice, or self-introduction
+4. DO NOT ask the user to write anything for you to check
+5. DO NOT mention any exceptions to rules yet
+
+START FRESH with Lesson 2 about definite articles:
+- Begin by explaining what definite articles are: words that correspond to "the" in English
+- Present ONLY these four forms: o (masc. singular), a (fem. singular), os (masc. plural), as (fem. plural)
+- Give SIMPLE examples with everyday objects like:
+  * "o livro" (the book)
+  * "a mesa" (the table) 
+  * "os livros" (the books)
+  * "as mesas" (the tables)
+- Explain how articles match the gender and number of the noun
+
+Focus EXCLUSIVELY on this topic without connecting to previous lessons or foreshadowing future lessons."""
                                 }, {
                                     "role": "user",
                                     "content": "I'm ready to start Lesson 2"
                                 }],
-                                temperature=0.7)
+                                temperature=0.5,
+                                max_tokens=800)
 
                             # Generate glossary for response text
                             glossary = self.extract_portuguese_words(response.choices[0].message.content)
