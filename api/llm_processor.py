@@ -115,7 +115,7 @@ Definite Articles (Lesson 2):
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4.1-mini",
                 messages=[{
                     "role":
                     "system",
@@ -149,7 +149,7 @@ Definite Articles (Lesson 2):
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4.1-mini",
                 messages=[{
                     "role":
                     "system",
@@ -184,7 +184,7 @@ Definite Articles (Lesson 2):
         try:
             # Don't skip processing - always check for Portuguese words
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4.1-mini",
                 messages=[{
                     "role": "system",
                     "content": """You are a Portuguese language assistant. Extract all Portuguese words and phrases from the given text and provide their English meanings.
@@ -281,7 +281,7 @@ IMPORTANT INSTRUCTIONS:
 
                 # Generate response based on current topic
                 syllabus_response = self.client.chat.completions.create(
-                    model="gpt-4o",
+                    model="gpt-4.1-mini",
                     messages=[{
                         "role":
                         "system",
@@ -304,7 +304,7 @@ IMPORTANT INSTRUCTIONS:
 
             # First determine if the text contains Portuguese
             detect_response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4.1-mini",
                 messages=[{
                     "role":
                     "system",
@@ -476,7 +476,7 @@ IMPORTANT INSTRUCTIONS:
                             next_subtopic = "A"  # Start with first subtopic of next lesson
                             # Create an explicit response for the transition to Lesson 2
                             response = self.client.chat.completions.create(
-                                model="gpt-4o",
+                                model="gpt-4.1-mini",
                                 messages=[{
                                     "role": "system",
                                     "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Skip any further review and transition directly to teaching 'o', 'a', 'os', 'as' and their usage. Do not ask for confirmation again or review Lesson 1 material."
@@ -550,7 +550,7 @@ IMPORTANT INSTRUCTIONS:
                     system_prompt += "\n\nThe user has attempted the current topic but made a mistake. Point out the specific error in their Portuguese response and ask them to try again. Provide the correct pattern again as a reminder. Do NOT move on to the next topic until they get this right."
 
                 response = self.client.chat.completions.create(
-                    model="gpt-4o",
+                    model="gpt-4.1-mini",
                     messages=[{
                         "role": "system",
                         "content": system_prompt
@@ -575,7 +575,7 @@ IMPORTANT INSTRUCTIONS:
             else:
                 # If not Portuguese, just respond normally in English
                 response = self.client.chat.completions.create(
-                    model="gpt-4o",
+                    model="gpt-4.1-mini",
                     messages=[{
                         "role":
                         "system",
