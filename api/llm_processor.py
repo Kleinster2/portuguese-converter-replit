@@ -485,13 +485,16 @@ IMPORTANT INSTRUCTIONS:
                         # Add review before moving to lesson 2
                         next_subtopic = "review"
                     elif self.current_subtopic == "review":
-                        # After review, move to lesson 2 - make this transition more robust
-                        # Consider almost any input in review stage as readiness to move on
+                        # After review, move to lesson 2 - treat any input (including "yes") as readiness to move on
                         # Only explicitly negative responses should keep in review mode
                         negative_responses = ["no", "not ready", "wait", "not yet", "more review"]
 
                         # Default to moving forward unless explicitly negative
                         ready_to_advance = not any(neg in question.lower() for neg in negative_responses)
+                        
+                        # Specifically recognize "yes" as a clear signal to advance
+                        if question.lower().strip() == "yes":
+                            ready_to_advance = True
 
                         if ready_to_advance:
                             self.current_lesson = 2
@@ -523,7 +526,7 @@ START FRESH with Lesson 2 about definite articles:
 Focus EXCLUSIVELY on this topic without connecting to previous lessons or foreshadowing future lessons."""
                                 }, {
                                     "role": "user",
-                                    "content": "I'm ready to start Lesson 2"
+                                    "content": "Yes, I'm ready to start Lesson 2"
                                 }],
                                 temperature=0.5,
                                 max_tokens=800)
