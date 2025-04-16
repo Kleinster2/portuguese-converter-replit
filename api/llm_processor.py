@@ -486,7 +486,7 @@ IMPORTANT INSTRUCTIONS:
                                 model="gpt-4.1-mini",
                                 messages=[{
                                     "role": "system",
-                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Skip any further review and transition directly to teaching 'o', 'a', 'os', 'as' and their usage. Provide clear masculine examples. Do not ask for confirmation again or review Lesson 1 material."
+                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Skip any further review and transition directly to teaching ONLY the definite articles with simple noun examples. Begin with 'o' (masculine singular) and provide clear examples like 'o livro' (the book), 'o carro' (the car). Then teach 'a' (feminine singular) with examples like 'a mesa' (the table), 'a cadeira' (the chair). Then teach 'os' (masculine plural) and 'as' (feminine plural) with appropriate examples. DO NOT mention city names or connect to previous material. Focus ONLY on explaining the definite articles and their basic usage patterns with everyday objects."
                                 }, {
                                     "role": "user",
                                     "content": "I'm ready to start Lesson 2"
