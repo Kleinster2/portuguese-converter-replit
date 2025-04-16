@@ -454,7 +454,7 @@ IMPORTANT INSTRUCTIONS:
                         system_prompt += "\n\nIMPORTANT: The user has successfully completed 'Eu moro em' and should now learn 'Eu falo' before moving to Lesson 2. Guide the user to practice 'Eu falo [language]' (I speak [language]) and only move to Lesson 2 after they've demonstrated this correctly."
                     # Only show definite articles prompt when we're actually moving to Lesson 2 (after review)
                     elif is_correct and self.current_subtopic == "review":
-                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Provide clear examples showing gender and number agreement. DO NOT mention or preview any lessons beyond Lesson 2."
+                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Start with masculine singular ('o'). Provide clear examples showing gender and number agreement. DO NOT mention or preview any lessons beyond Lesson 2. DO NOT ASK FOR CONFIRMATION - assume the user is ready to begin Lesson 2."
 
                 next_subtopic = None
 
@@ -470,8 +470,15 @@ IMPORTANT INSTRUCTIONS:
                         # Add review before moving to lesson 2
                         next_subtopic = "review"
                     elif self.current_subtopic == "review":
-                        # After review, move to lesson 2
-                        if user_agreed or "ready" in question.lower() or "next" in question.lower():
+                        # After review, move to lesson 2 - make this transition more robust
+                        # Consider almost any input in review stage as readiness to move on
+                        # Only explicitly negative responses should keep in review mode
+                        negative_responses = ["no", "not ready", "wait", "not yet", "more review"]
+                        
+                        # Default to moving forward unless explicitly negative
+                        ready_to_advance = not any(neg in question.lower() for neg in negative_responses)
+                        
+                        if ready_to_advance:
                             self.current_lesson = 2
                             next_subtopic = "A"  # Start with first subtopic of next lesson
                             # Create an explicit response for the transition to Lesson 2
@@ -479,7 +486,7 @@ IMPORTANT INSTRUCTIONS:
                                 model="gpt-4.1-mini",
                                 messages=[{
                                     "role": "system",
-                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Skip any further review and transition directly to teaching 'o', 'a', 'os', 'as' and their usage. Do not ask for confirmation again or review Lesson 1 material."
+                                    "content": system_prompt + "\n\nThe user is ready to move to Lesson 2 on definite articles. Skip any further review and transition directly to teaching 'o', 'a', 'os', 'as' and their usage. Provide clear masculine examples. Do not ask for confirmation again or review Lesson 1 material."
                                 }, {
                                     "role": "user",
                                     "content": "I'm ready to start Lesson 2"
@@ -495,7 +502,7 @@ IMPORTANT INSTRUCTIONS:
 
                             return response.choices[0].message.content, False, None, glossary
                         else:
-                            # Keep in review mode until user confirms readiness
+                            # Only keep in review mode if user explicitly wants more review
                             next_subtopic = "review"
                     else:
                         next_subtopic = "A"  # Fallback in case of unexpected subtopic
