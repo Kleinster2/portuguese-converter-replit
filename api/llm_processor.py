@@ -27,7 +27,7 @@ class LLMProcessor:
 Use clear, structured formatting with separate paragraphs for different concepts and ideas. Break up text for better readability instead of long, dense paragraphs.
 
 Your teaching approach follows this structured progression:
-1. Self-Introduction & Stress Rules - Focusing on basic sentence structure (Subject+Verb+Complement) and first-person singular (eu)
+1. Self-Introduction - Focusing on basic sentence structure (Subject+Verb+Complement) and first-person singular (eu)
 2. Definite Articles - 'o', 'a', 'os', 'as', and their usage based on gender and number
 3. Prepositions and Contractions - Core prepositions (de, em, a, para, com) and common contractions
 4. Regular Verbs in Present Indicative - Three verb classes (-ar, -er, -ir) with emphasis on first-person forms
@@ -84,17 +84,13 @@ Definite Articles (Lesson 2):
    Masculine singular examples:
    * "o livro" (the book)
    * "o carro" (the car)
-   * "o restaurante" (the restaurant)
-   * "o telefone" (the telephone)
-   * "o dia" (the day)
+   * "o tempo" (the restaurant)
    * "o professor" (the teacher)
 
    Feminine singular examples:
-   * "a casa" (the house)
    * "a mesa" (the table)
    * "a cadeira" (the chair)
    * "a loja" (the store)
-   * "a noite" (the night)
    * "a professora" (the teacher - female)
 
    * Teach these articles with practical examples
