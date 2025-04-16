@@ -58,7 +58,7 @@ IMPORTANT:
 9. Present a complete introduction from the beginning - introduce name, origin, etc. as a complete sequence rather than isolating name only.
 10. If a user makes a mistake in their Portuguese response, point out the mistake specifically and ask them to try again. Do not move on to the next concept until they get the current one right.
 11. Always repeat back what the user has already learned correctly. Even in later steps, remind the user of what they've mastered in previous steps by including their correct responses in a matter-of-fact way. For example: "You've used 'Eu sou [name]' and 'Eu sou de [city]' correctly. Now let's learn..."
-12. Use non-Brazilian/Portuguese cities in examples (like Nova York, London, Paris, Tokyo, Berlin, etc.) as learners are likely not from Portuguese-speaking locations.
+12. Use non-Brazilian/Portuguese cities in examples (like Nova York, Londres, Paris, Tokyo, Berlin, etc.) as learners are likely not from Portuguese-speaking locations.
 13. Use a direct, adult tone in responses - avoid overly enthusiastic praise or infantilizing language. Treat the user as an adult learner.
 
 Self-Introduction & Stress Rules, break it down into these subtopics to be taught in sequence:
@@ -72,7 +72,7 @@ Self-introduction basics (Lesson 1):
    * Present these as a natural progression of introducing oneself
    * For city names, note that most don't use articles in Portuguese
    * Exceptions include Rio de Janeiro (masculine) and a few others
-   * Use cities like Paris, London, Tokyo, Berlin, etc. for examples
+   * Use cities like Paris, Londres, Tokyo, Berlin, etc. for examples
    * Clarify that "Eu sou de [city]" refers specifically to hometown/where they grew up
 
 Definite Articles (Lesson 2):
@@ -355,7 +355,7 @@ IMPORTANT INSTRUCTIONS:
                 # Check if user has demonstrated the current topic correctly
                 has_demonstrated = current_pattern in question.lower()
                 is_correct = has_demonstrated
-                
+
                 # Ensure we're following the proper sequence (A→B→C→D→review)
                 expected_subtopic_sequence = ["A", "B", "C", "D", "review"]
                 current_index = expected_subtopic_sequence.index(self.current_subtopic) if self.current_subtopic in expected_subtopic_sequence else 0
@@ -404,7 +404,7 @@ IMPORTANT INSTRUCTIONS:
                         # Get the current city from input preserving capitalization
                         current_city = " ".join(word for word in question.split()[3:])
                         self.user_info['current_city'] = current_city
-                        
+
                     # Add specific instruction to ensure 'Eu falo' is taught next
                     if is_correct:
                         system_prompt += "\n\nThe user has correctly used 'Eu moro em'. Now teach them about 'Eu falo [language]' (I speak [language]). Provide examples like 'Eu falo inglês' (I speak English), 'Eu falo português' (I speak Portuguese), etc. This is the final phrase in our self-introduction sequence before reviewing."
@@ -474,10 +474,10 @@ IMPORTANT INSTRUCTIONS:
                         # Consider almost any input in review stage as readiness to move on
                         # Only explicitly negative responses should keep in review mode
                         negative_responses = ["no", "not ready", "wait", "not yet", "more review"]
-                        
+
                         # Default to moving forward unless explicitly negative
                         ready_to_advance = not any(neg in question.lower() for neg in negative_responses)
-                        
+
                         if ready_to_advance:
                             self.current_lesson = 2
                             next_subtopic = "A"  # Start with first subtopic of next lesson
