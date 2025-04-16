@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from portuguese_converter import convert_text
@@ -6,6 +5,9 @@ from tts_converter import TTSConverter
 from twilio_handler import TwilioHandler
 from llm_processor import LLMProcessor
 import logging
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +32,12 @@ llm_processor = LLMProcessor()
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    return send_from_directory('..', 'index.html')
+    root = os.getcwd()
+    # serve static files if they exist
+    if path and os.path.exists(os.path.join(root, path)):
+        return send_from_directory(root, path)
+    # fallback to index.html for SPA routes
+    return send_from_directory(root, 'index.html')
 
 @app.route('/api/portuguese_converter', methods=['GET', 'POST'])
 def handle_portuguese_converter():

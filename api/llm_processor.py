@@ -1,4 +1,5 @@
 import os
+print("DEBUG: Running llm_processor.py from:", os.path.abspath(__file__))
 import re
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -12,6 +13,7 @@ class LLMProcessor:
     def __init__(self):
         load_dotenv()
         self.api_key = os.getenv('OPENAI_API_KEY')
+        print(f"[DEBUG] OPENAI_API_KEY loaded: {self.api_key}")  # Debug print
         if not self.api_key:
             logger.warning("Warning: OPENAI_API_KEY not found in environment")
             self.client = None
@@ -256,16 +258,7 @@ IMPORTANT INSTRUCTIONS:
             return []
 
     def ask_question(self, question):
-        """
-        Interactive chat with LLM that detects Portuguese text and converts it if needed,
-        but always responds in English
-
-        Args:
-            question (str): User's input text/question
-
-        Returns:
-            tuple: (response_text, has_portuguese, colloquial_version, glossary)
-        """
+        print("DEBUG: ask_question method -- LOCAL VERSION RUNNING")
         if not self.client:
             return "Sorry, API key not configured.", False, None, []
 
@@ -469,122 +462,12 @@ IMPORTANT INSTRUCTIONS:
                         system_prompt += "\n\nIMPORTANT: The user has successfully completed 'Eu moro em' and should now learn 'Eu falo' before moving to Lesson 2. Guide the user to practice 'Eu falo [language]' (I speak [language]) and only move to Lesson 2 after they've demonstrated this correctly."
                     # Only show definite articles prompt when we're actually moving to Lesson 2 (after review)
                     elif is_correct and self.current_subtopic == "review":
-                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak, DO NOT request any practice or examples from the user, and DO NOT mention cities or previous material. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage with everyday objects (not cities or names). Provide clear examples showing gender and number agreement with common nouns. DO NOT request any writing from the user or ask them to demonstrate what they've learned. DO NOT mention or preview any lessons beyond Lesson 2. DO NOT ASK FOR CONFIRMATION - assume the user is ready to begin Lesson 2."
-
-                next_subtopic = None
-
-                if is_correct:
-                    # Only advance to next subtopic when demonstrated correctly
-                    if self.current_subtopic == "A":
-                        next_subtopic = "B"
-                    elif self.current_subtopic == "B":
-                        next_subtopic = "C"
-                    elif self.current_subtopic == "C":
-                        next_subtopic = "D"
-                    elif self.current_subtopic == "D":
-                        # Add review before moving to lesson 2
-                        next_subtopic = "review"
+                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak, DO NOT request any practice or examples from the user, and DO NOT mention cities or previous material. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage with everyday objects (not cities or names). Provide clear examples showing gender and number agreement."
+                    elif self.current_subtopic == "A" and self.current_lesson == 2:
+                        system_prompt += "\n\nIMPORTANT: Now move to teaching Lesson 2 on definite articles. Do NOT suggest more languages to speak. Introduce the definite articles 'o', 'a', 'os', 'as' and explain when to use them. Provide clear examples showing gender and number agreement."
+                    elif self.current_subtopic == "A" and self.current_lesson == 3:
+                        system_prompt += "\n\nIMPORTANT: Now move to teaching Lesson 3 on prepositions and contractions. Introduce the preposition 'de' and its various uses. Provide clear examples of how prepositions are used in everyday conversation."
                     elif self.current_subtopic == "review":
-                        # After review, move to lesson 2 - treat any input (including "yes") as readiness to move on
-                        # Only explicitly negative responses should keep in review mode
-                        negative_responses = ["no", "not ready", "wait", "not yet", "more review"]
-
-                        # Default to moving forward unless explicitly negative
-                        ready_to_advance = not any(neg in question.lower() for neg in negative_responses)
-                        
-                        # Specifically recognize "yes" as a clear signal to advance
-                        if question.lower().strip() == "yes":
-                            ready_to_advance = True
-
-                        if ready_to_advance:
-                            self.current_lesson = 2
-                            next_subtopic = "A"  # Start with first subtopic of next lesson
-                            # Create an explicit response for the transition to Lesson 2
-                            response = self.client.chat.completions.create(
-                                model="gpt-4.1-mini",
-                                messages=[{
-                                    "role": "system",
-                                    "content": """You are a Portuguese language tutor starting Lesson 2 on definite articles.
-
-IMPORTANT CONSTRAINTS:
-1. DO NOT review or mention ANY previous lesson material
-2. DO NOT mention cities or self-introductions
-3. DO NOT ask for ANY homework, practice, or self-introduction
-4. DO NOT ask the user to write anything for you to check
-5. DO NOT mention any exceptions to rules yet
-
-START FRESH with Lesson 2 about definite articles:
-- Begin by explaining what definite articles are: words that correspond to "the" in English
-- Present ONLY these four forms: o (masc. singular), a (fem. singular), os (masc. plural), as (fem. plural)
-- Give SIMPLE examples with everyday objects like:
-  * "o livro" (the book)
-  * "a mesa" (the table) 
-  * "os livros" (the books)
-  * "as mesas" (the tables)
-- Explain how articles match the gender and number of the noun
-
-Focus EXCLUSIVELY on this topic without connecting to previous lessons or foreshadowing future lessons."""
-                                }, {
-                                    "role": "user",
-                                    "content": "Yes, I'm ready to start Lesson 2"
-                                }],
-                                temperature=0.5,
-                                max_tokens=800)
-
-                            # Generate glossary for response text
-                            glossary = self.extract_portuguese_words(response.choices[0].message.content)
-
-                            # Move to next subtopic AFTER generating response
-                            self.current_subtopic = next_subtopic
-                            self.current_lesson = 2
-
-                            return response.choices[0].message.content, False, None, glossary
-                        else:
-                            # Only keep in review mode if user explicitly wants more review
-                            next_subtopic = "review"
-                    else:
-                        next_subtopic = "A"  # Fallback in case of unexpected subtopic
-                # Track what the user has learned correctly with actual user information
-                learned_phrases = []
-                if self.current_subtopic >= "B":
-                    name = self.user_info.get('name', '[name]')
-                    learned_phrases.append(f"Eu sou {name}")
-                if self.current_subtopic >= "C":
-                    hometown = self.user_info.get('hometown', '[city]')
-                    learned_phrases.append(f"Eu sou de {hometown}")
-                if self.current_subtopic >= "D":
-                    current_city = self.user_info.get('current_city', '[city]')
-                    learned_phrases.append(f"Eu moro em {current_city}")
-
-                # Prepare phrases already learned for inclusion in the prompt
-                learned_phrases_text = ""
-                if learned_phrases:
-                    learned_phrases_text = "The user has correctly learned these specific phrases: " + ", ".join(learned_phrases) + ". Always use these exact phrases with their specific information when reminding them of what they've learned, rather than using placeholders like [name] or [city]."
-
-                # Always respond in English, even if user input is in Portuguese
-                system_prompt += "\n\n" + learned_phrases_text + "\n\nIMPORTANT: Always respond ONLY in English, even when the user writes in Portuguese. Never respond in Portuguese. For Portuguese phrases, only provide them as examples with English translations. NEVER include any step numbers (like 'Step 1A') in your responses to the user. DO NOT reveal the upcoming sequence of lessons or phrases - focus only on the current lesson being taught. Do not mention or preview any future lessons beyond the current one."
-
-                if is_correct and next_subtopic:
-                    # When user demonstrates correct understanding, move to next topic
-                    next_topic_names = {
-                        "A": "self-introduction with 'Eu sou [name]'",
-                        "B": "expressing hometown/origin with 'Eu sou de [city]'",
-                        "C": "expressing current residence with 'Eu moro em [city]'",
-                        "D": "expressing language with 'Eu falo [language]'",
-                        "review": "Review of Lesson 1"
-                    }
-                    # Include headers without step numbers
-                    subtopic_header = subtopic_headers[
-                        next_subtopic] if 'subtopic_headers' in locals(
-                        ) else f"{next_topic_names[next_subtopic].capitalize()}"
-                    system_prompt += "\n\nThe user has demonstrated correct understanding of the current topic. "
-
-                    # Add specific guidance based on which subtopic we're moving to
-                    if next_subtopic == "A" and self.current_lesson == 2:
-                        system_prompt += "IMPORTANT: Now move to teaching Lesson 2 on definite articles. Do NOT suggest more languages to speak. Introduce the definite articles 'o', 'a', 'os', 'as' and explain when to use them. Provide clear examples showing gender and number agreement."
-                    elif next_subtopic == "A" and self.current_lesson == 3:
-                        system_prompt += "IMPORTANT: Now move to teaching Lesson 3 on prepositions and contractions. Introduce the preposition 'de' and its various uses. Provide clear examples of how prepositions are used in everyday conversation."
-                    elif next_subtopic == "review":
                         system_prompt += "Before moving to Lesson 2 on definite articles, provide a comprehensive review of Lesson 1. Summarize all four components they've learned: 'Eu sou [name]', 'Eu sou de [city]', 'Eu moro em [city]', and 'Eu falo [language]'. Use the user's actual provided information in your examples. After this review, instruct the user to confirm when they're ready to proceed to Lesson 2."
                     else:
                         system_prompt += "Then introduce the next concept. Provide a clear example of the next phrase pattern. Move directly to teaching the next concept."
@@ -605,9 +488,12 @@ Focus EXCLUSIVELY on this topic without connecting to previous lessons or foresh
                     }],
                     temperature=0.7)
 
-                # Only update the current subtopic after generating the response if correct
-                if is_correct and next_subtopic:
-                    self.current_subtopic = next_subtopic
+                # Advance to next subtopic if correct
+                if is_correct:
+                    expected_subtopic_sequence = ["A", "B", "C", "D", "review"]
+                    current_index = expected_subtopic_sequence.index(self.current_subtopic) if self.current_subtopic in expected_subtopic_sequence else 0
+                    if current_index < len(expected_subtopic_sequence) - 1:
+                        self.current_subtopic = expected_subtopic_sequence[current_index + 1]
 
                 # Convert the Portuguese text to colloquial form
                 colloquial_text, _ = self.transform_to_colloquial(question)
