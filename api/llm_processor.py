@@ -355,6 +355,10 @@ IMPORTANT INSTRUCTIONS:
                 # Check if user has demonstrated the current topic correctly
                 has_demonstrated = current_pattern in question.lower()
                 is_correct = has_demonstrated
+                
+                # Ensure we're following the proper sequence (A→B→C→D→review)
+                expected_subtopic_sequence = ["A", "B", "C", "D", "review"]
+                current_index = expected_subtopic_sequence.index(self.current_subtopic) if self.current_subtopic in expected_subtopic_sequence else 0
 
                 # More specific validation for each subtopic
                 if self.current_subtopic == "A" and has_demonstrated:
@@ -400,6 +404,10 @@ IMPORTANT INSTRUCTIONS:
                         # Get the current city from input preserving capitalization
                         current_city = " ".join(word for word in question.split()[3:])
                         self.user_info['current_city'] = current_city
+                        
+                    # Add specific instruction to ensure 'Eu falo' is taught next
+                    if is_correct:
+                        system_prompt += "\n\nThe user has correctly used 'Eu moro em'. Now teach them about 'Eu falo [language]' (I speak [language]). Provide examples like 'Eu falo inglês' (I speak English), 'Eu falo português' (I speak Portuguese), etc. This is the final phrase in our self-introduction sequence before reviewing."
                 elif self.current_subtopic == "D" and has_demonstrated:
                     # Check if "Eu falo [language]" is properly formed
                     is_correct = "eu falo" in question.lower() and len(question.split()) >= 3
@@ -434,8 +442,8 @@ IMPORTANT INSTRUCTIONS:
                             system_prompt += f"\n\nI noticed the user used the English word '{lang}' in their Portuguese sentence. This is a learning opportunity, not a mistake. Teach them that the Portuguese word for '{lang}' is '{portuguese_languages[i]}'. Acknowledge that their sentence structure was correct, and they're learning new vocabulary."
                             break
 
-                    # If moving to next lesson (Lesson 2 on prepositions)
-                    if is_correct:
+                    # Only move to Lesson 2 if we've completed subtopic D ("Eu falo...")
+                    if is_correct and self.current_subtopic == "D":
                         # Examples for definite articles in Lesson 2
                         article_examples = [
                             "O livro (The book) - masculine singular",
@@ -443,6 +451,9 @@ IMPORTANT INSTRUCTIONS:
                             "Os livros (The books) - masculine plural",
                             "As casas (The houses) - feminine plural"
                         ]
+                        system_prompt += "\n\nIMPORTANT: The user has successfully completed 'Eu moro em' and should now learn 'Eu falo' before moving to Lesson 2. Guide the user to practice 'Eu falo [language]' (I speak [language]) and only move to Lesson 2 after they've demonstrated this correctly."
+                    # Only show definite articles prompt when we're actually moving to Lesson 2 (after review)
+                    elif is_correct and self.current_subtopic == "review":
                         system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage. Provide clear examples showing gender and number agreement. DO NOT mention or preview any lessons beyond Lesson 2."
 
                 next_subtopic = None
