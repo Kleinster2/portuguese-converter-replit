@@ -257,17 +257,9 @@ def ask_llm():
         # Process the user's text with the LLM
         response, is_portuguese, colloquial_version, _ = llm_processor.ask_question(user_text)
 
-        # Extract Portuguese words ONLY from the system's response
-        # This ensures we're creating a glossary of terms the system is teaching
-        glossary = []
-        if '"' in response:
-            glossary = llm_processor.extract_portuguese_words(response)
-            logger.info(f"Extracted glossary from system response: {len(glossary)} items")
-            
         result = {
             'response': response,
-            'is_portuguese': is_portuguese,
-            'glossary': glossary
+            'is_portuguese': is_portuguese
         }
 
         # Include colloquial version if Portuguese was detected
@@ -297,4 +289,4 @@ def twilio_webhook():
         return '', 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3001, debug=False)
+    app.run(host='0.0.0.0', port=3001, debug=True)
