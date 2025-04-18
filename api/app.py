@@ -257,7 +257,8 @@ def ask_llm():
 
         # Load state from DB
         state = get_user_state(user_id)
-        response, is_portuguese, colloquial_version, _, new_state = llm_processor.ask_question(
+        # The restored ask_question returns only 4 values
+        response, is_portuguese, colloquial_version, new_state = llm_processor.ask_question(
             user_text
         )
         # Save updated state
