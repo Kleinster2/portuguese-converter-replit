@@ -450,19 +450,54 @@ IMPORTANT INSTRUCTIONS:
                             system_prompt += f"\n\nI noticed the user used the English word '{lang}' in their Portuguese sentence. This is a learning opportunity, not a mistake. Teach them that the Portuguese word for '{lang}' is '{portuguese_languages[i]}'. Acknowledge that their sentence structure was correct, and they're learning new vocabulary."
                             break
 
-                    # Only move to Lesson 2 if we've completed subtopic D ("Eu falo...")
+                    # After 'Eu falo ...', trigger a recap and move directly to Lesson 2
                     if is_correct and self.current_subtopic == "D":
-                        # Examples for definite articles in Lesson 2
-                        article_examples = [
-                            "O livro (The book) - masculine singular",
-                            "A casa (The house) - feminine singular",
-                            "Os livros (The books) - masculine plural",
-                            "As casas (The houses) - feminine plural"
-                        ]
-                        system_prompt += "\n\nIMPORTANT: The user has successfully completed 'Eu moro em' and should now learn 'Eu falo' before moving to Lesson 2. Guide the user to practice 'Eu falo [language]' (I speak [language]) and only move to Lesson 2 after they've demonstrated this correctly."
-                    # Only show definite articles prompt when we're actually moving to Lesson 2 (after review)
-                    elif is_correct and self.current_subtopic == "review":
-                        system_prompt += "\n\nIMPORTANT: The user has successfully completed the self-introduction lesson. DO NOT suggest more languages to speak, DO NOT request any practice or examples from the user, and DO NOT mention cities or previous material. Move directly to Lesson 2 on definite articles. Begin teaching about the definite articles 'o', 'a', 'os', 'as', and their usage with everyday objects (not cities or names). Provide clear examples showing gender and number agreement."
+                        # Always use the most recent value of language (from this answer)
+                        language = None
+                        # Try to extract the language from the current answer, if possible
+                        lang_match = re.search(r'eu\s+falo\s+(\w+(?:\s+\w+)*)', question.lower())
+                        if lang_match:
+                            # Use the actual user input for the language
+                            language = " ".join(word for word in question.split()[2:])
+                        else:
+                            language = self.user_info.get('language', '[language]')
+                        recap = "Here is a recap of your self-introduction in Portuguese, using your own information:\n\n"
+                        name = self.user_info.get('name', '[name]')
+                        hometown = self.user_info.get('hometown', '[city]')
+                        current_city = self.user_info.get('current_city', '[city]')
+                        recap += f'"Eu sou {name}" - I am {name}\n'
+                        recap += f'"Eu sou de {hometown}" - I am from {hometown}\n'
+                        recap += f'"Eu moro em {current_city}" - I live in {current_city}\n'
+                        recap += f'"Eu falo {language}" - I speak {language}\n\n'
+                        recap += "Now let's move on to the next topic: definite articles in Portuguese.\n\n"
+                        recap += "The definite articles are: 'o' (masculine singular), 'a' (feminine singular), 'os' (masculine plural), and 'as' (feminine plural). Here are some examples:\n"
+                        recap += "- 'o' (masculine singular)\n- 'a' (feminine singular)\n- 'os' (masculine plural)\n- 'as' (feminine plural)\n\n"
+                        recap += "Now, could you tell me your preferred pronoun (he/him, she/her, or they/them)? This will help personalize your introduction in Portuguese using the correct article. Please reply with your pronoun."
+                        system_prompt += f"\n\n{recap}"
+                        self.current_subtopic = "A"
+                        self.current_lesson = 2
+                        # Store that we are waiting for pronoun
+                        self.user_info['awaiting_pronoun'] = True
+                    # After user provides pronoun, present 'Eu sou o/a [name]' form
+                    elif self.user_info.get('awaiting_pronoun') and ('he/him' in question.lower() or 'she/her' in question.lower() or 'they/them' in question.lower()):
+                        pronoun = None
+                        article = None
+                        if 'he/him' in question.lower():
+                            pronoun = 'he/him'
+                            article = 'o'
+                        elif 'she/her' in question.lower():
+                            pronoun = 'she/her'
+                            article = 'a'
+                        elif 'they/them' in question.lower():
+                            pronoun = 'they/them'
+                            article = 'x'
+                        name = self.user_info.get('name', '[name]')
+                        # Save pronoun and article
+                        self.user_info['pronoun'] = pronoun
+                        self.user_info['article'] = article
+                        self.user_info['awaiting_pronoun'] = False
+                        # Present the personalized introduction
+                        system_prompt += f"\n\nBased on your pronoun, here is how you would introduce yourself in Portuguese using the correct article:\n\n\"Eu sou {article} {name}\" - I am {name} (with the appropriate article for your gender/pronoun).\n\nLet's continue with more about definite articles and their usage."
                     elif self.current_subtopic == "A" and self.current_lesson == 2:
                         system_prompt += "\n\nIMPORTANT: Now move to teaching Lesson 2 on definite articles. Do NOT suggest more languages to speak. Introduce the definite articles 'o', 'a', 'os', 'as' and explain when to use them. Provide clear examples showing gender and number agreement."
                     elif self.current_subtopic == "A" and self.current_lesson == 3:
