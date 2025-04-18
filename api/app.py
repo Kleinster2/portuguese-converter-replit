@@ -7,6 +7,7 @@ from llm_processor import LLMProcessor
 import logging
 import os
 from dotenv import load_dotenv
+from user_state_db import get_user_state, save_user_state
 load_dotenv()
 
 # Configure logging
@@ -32,11 +33,10 @@ llm_processor = LLMProcessor()
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    root = os.getcwd()
-    # serve static files if they exist
+    # Always serve from the project root (one level up from api/)
+    root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     if path and os.path.exists(os.path.join(root, path)):
         return send_from_directory(root, path)
-    # fallback to index.html for SPA routes
     return send_from_directory(root, 'index.html')
 
 @app.route('/api/portuguese_converter', methods=['GET', 'POST'])
@@ -249,13 +249,19 @@ def ask_llm():
     """Interactive endpoint for LLM chat with Portuguese detection"""
     try:
         data = request.get_json()
-        if not data or 'text' not in data:
-            return jsonify({'error': 'No text provided'}), 400
+        if not data or 'text' not in data or 'username' not in data:
+            return jsonify({'error': 'No text or username provided'}), 400
 
         user_text = data['text']
+        user_id = data['username']
 
-        # Process the user's text with the LLM
-        response, is_portuguese, colloquial_version, _ = llm_processor.ask_question(user_text)
+        # Load state from DB
+        state = get_user_state(user_id)
+        response, is_portuguese, colloquial_version, _, new_state = llm_processor.ask_question(
+            user_text
+        )
+        # Save updated state
+        save_user_state(user_id, new_state)
 
         result = {
             'response': response,
@@ -265,8 +271,6 @@ def ask_llm():
         # Include colloquial version if Portuguese was detected
         if is_portuguese and colloquial_version:
             result['colloquial'] = colloquial_version
-
-            # Also include rule-based transformation for comparison
             rule_based = convert_text(user_text)
             result['rule_based'] = rule_based['after']
 
